@@ -243,7 +243,6 @@ const actions = {
     //       resolve([])
     //     })
     // })
-
     const menus =
     [{
       path: '/userManage',
@@ -254,23 +253,8 @@ const actions = {
           name: 'Form',
           component: '/userManage/index',
           meta: {
-            'title': '用户管理',
+            'title': '权限管理',
             'icon': 'user'
-          }
-        }
-      ]
-    },
-    {
-      path: '/form',
-      component: 'Layout',
-      children: [
-        {
-          path: 'index',
-          name: 'Form',
-          component: '/form/index',
-          meta: {
-            'title': '表单',
-            'icon': 'form'
           }
         }
       ]
@@ -280,7 +264,6 @@ const actions = {
       redirect: '/404',
       hidden: true
     }]
-    // menus[menus.length] = { path: '*', redirect: '/404', hidden: true }
     return new Promise(resolve => {
       commit('SET_MENUS', menus)
       resolve(menus)

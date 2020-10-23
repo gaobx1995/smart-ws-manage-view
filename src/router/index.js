@@ -53,29 +53,18 @@ export const constantRoutes = [
       component: () => import('@/views/dashboard/index'),
       meta: { title: '首页', icon: 'dashboard' }
     }]
+  },
+  {
+    path: '/userManage/users',
+    hidden: true,
+    component: Layout,
+    children: [{
+      path: 'index',
+      name: 'UsersIndex',
+      component: () => import('@/views/users/index'),
+      meta: { title: '用户管理' }
+    }]
   }
-
-  // {
-  //   path: '/manage',
-  //   component: Layout,
-  //   children: [{
-  //     path: 'userManange',
-  //     name: 'UserManange',
-  //     component: () => import('@/views/userManage/index'),
-  //     meta: { title: '用户管理', icon: 'el-icon-user' }
-  //   }]
-  // },
-
-  // {
-  //   path: 'external-link',
-  //   component: Layout,
-  //   children: [
-  //     {
-  //       path: 'https://panjiachen.github.io/vue-element-admin-site/#/',
-  //       meta: { title: 'External Link', icon: 'link' }
-  //     }
-  //   ]
-  // },
 
   // 404 page must be placed at the end !!!
   // { path: '*', redirect: '/404', hidden: true }

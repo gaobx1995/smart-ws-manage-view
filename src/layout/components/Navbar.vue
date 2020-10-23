@@ -1,27 +1,32 @@
 <template>
   <div class="navbar">
     <hamburger :is-active="sidebar.opened" class="hamburger-container" @toggleClick="toggleSideBar" />
-
-    <!-- <breadcrumb class="breadcrumb-container" /> -->
-
+    <div style="float:left;margin:-5px">
+      <el-menu
+        background-color="white"
+        text-color="#606266"
+        active-text-color="#155cb5"
+        class="el-menu-demo"
+        mode="horizontal"
+        @select="handleSelect"
+      >
+        <el-menu-item index="1">处理中心</el-menu-item>
+        <el-menu-item index="2">我的工作台</el-menu-item>
+        <el-menu-item index="/dashboard" router>消息中心</el-menu-item>
+        <el-menu-item index="4">订单管理</el-menu-item>
+      </el-menu>
+    </div>
     <div class="right-menu">
       <el-dropdown class="avatar-container" trigger="click">
-        <div class="avatar-wrapper">
-          <img :src="avatar+'?imageView2/1/w/80/h/80'" class="user-avatar">
-          <i class="el-icon-caret-bottom" />
-        </div>
-        <el-dropdown-menu slot="dropdown" class="user-dropdown">
+        <span class="el-dropdown-link" style="cursor:pointer">
+          登录人<i class="el-icon-arrow-down el-icon--right" />
+        </span>
+        <el-dropdown-menu slot="dropdown">
           <router-link to="/">
             <el-dropdown-item>
               Home
             </el-dropdown-item>
           </router-link>
-          <a target="_blank" href="https://github.com/PanJiaChen/vue-admin-template/">
-            <el-dropdown-item>Github</el-dropdown-item>
-          </a>
-          <a target="_blank" href="https://panjiachen.github.io/vue-element-admin-site/#/">
-            <el-dropdown-item>Docs</el-dropdown-item>
-          </a>
           <el-dropdown-item divided @click.native="logout">
             <span style="display:block;">Log Out</span>
           </el-dropdown-item>
@@ -33,12 +38,10 @@
 
 <script>
 import { mapGetters } from 'vuex'
-// import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
 
 export default {
   components: {
-    // Breadcrumb,
     Hamburger
   },
   computed: {
@@ -47,7 +50,19 @@ export default {
       'avatar'
     ])
   },
+  mounted() {
+    console.log('mounted')
+  },
   methods: {
+    handleSelect(key, keyPath) {
+      console.log(key, keyPath)
+      this.$router.push({
+        path: '/userManage/users/index',
+        query: {
+          t: +new Date() // 保证每次点击路由的query项都是不一样的，确保会重新刷新view
+        }
+      })
+    },
     toggleSideBar() {
       this.$store.dispatch('app/toggleSideBar')
     },
@@ -61,7 +76,7 @@ export default {
 
 <style lang="scss" scoped>
 .navbar {
-  height: 50px;
+  height: 45px;
   overflow: hidden;
   position: relative;
   background: #fff;

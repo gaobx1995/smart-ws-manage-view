@@ -4,13 +4,19 @@
       <div class="applications">
         <el-card class="box-card">
           <div slot="header" class="clearfix">
-            <span>应用 </span>
+            <span>应用</span>
           </div>
-          <div>
-            <svg-icon style="font-size:2em;float:left" icon-class="datamanage" />
-            <svg-icon style="font-size:2em;float:left" icon-class="datamanage" />
-            <svg-icon style="font-size:2em;float:left" icon-class="datamanage" />
-          </div>
+          <el-row :gutter="12">
+            <el-col :span="8" :push="2">
+              <svg-icon style="font-size:8em;cursor: pointer;" icon-class="cockpit" @click="clickLinkOther" />
+            </el-col>
+            <el-col :span="8" :push="2">
+              <svg-icon style="font-size:8em;cursor: pointer;" icon-class="tasklist" />
+            </el-col>
+            <el-col :span="8" :push="2">
+              <svg-icon style="font-size:8em;cursor: pointer;" icon-class="admin" @click="clickLinkToUser" />
+            </el-col>
+          </el-row>
         </el-card>
       </div>
       <div class="profile">
@@ -48,13 +54,17 @@ export default {
     ])
   },
   methods: {
-    clickLink() {
+    clickLinkToUser() {
       this.$router.push({
         path: '/userManage/index',
         query: {
           t: +new Date() // 保证每次点击路由的query项都是不一样的，确保会重新刷新view
         }
       })
+    },
+    clickLinkOther() {
+      // window.open('http://10.15.2.10:34827/login?redirect=%2Fdashboard', '_blank')
+      window.location.href = 'http://10.15.2.10:34827/dashboard'
     }
   }
 }
