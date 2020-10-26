@@ -63,6 +63,11 @@ export const constantRoutes = [
       name: 'UsersIndex',
       component: () => import('@/views/users/index'),
       meta: { title: '用户管理' }
+    }, {
+      path: 'index',
+      name: 'UsersList',
+      component: () => import('@/views/users/list'),
+      meta: { title: '用户列表' }
     }]
   }
 

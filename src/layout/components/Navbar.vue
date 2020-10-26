@@ -51,7 +51,7 @@ export default {
     ])
   },
   mounted() {
-    console.log('mounted')
+    // console.log('mounted')
   },
   methods: {
     handleSelect(key, keyPath) {

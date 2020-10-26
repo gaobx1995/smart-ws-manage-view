@@ -93,4 +93,7 @@ export default {
   margin: 10px 0 20px 0;
   height: 250px;
 }
+.app-container{
+  background: #afafaf47;
+}
 </style>
