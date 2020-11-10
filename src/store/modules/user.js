@@ -245,13 +245,13 @@ const actions = {
     // })
     const menus =
     [{
-      path: '/userManage',
+      path: '/adminManage',
       component: 'Layout',
       children: [
         {
           path: 'index',
           name: 'Form',
-          component: '/userManage/index',
+          component: '/adminManage/index',
           meta: {
             'title': '权限管理',
             'icon': 'user'

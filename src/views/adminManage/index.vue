@@ -15,8 +15,7 @@
         <el-col :span="8">
           <el-card class="box-card">
             <div slot="header" class="clearfix">
-              <span>卡片名称</span>
-              <el-button style="float: right; padding: 3px 0" type="text">操作按钮</el-button>
+              <el-link type="primary" :underline="false" style="font-size:1.5em" @click="linkToGroups">组管理</el-link>
             </div>
             <div v-for="o in 4" :key="o" class="text item">
               {{ '列表内容 ' + o }}
@@ -26,8 +25,7 @@
         <el-col :span="8">
           <el-card class="box-card">
             <div slot="header" class="clearfix">
-              <span>卡片名称</span>
-              <el-button style="float: right; padding: 3px 0" type="text">操作按钮</el-button>
+              <el-link type="primary" :underline="false" style="font-size:1.5em" @click="linkToUsers">用户管理</el-link>
             </div>
             <div v-for="o in 4" :key="o" class="text item">
               {{ '列表内容 ' + o }}
@@ -37,8 +35,7 @@
         <el-col :span="8">
           <el-card class="box-card">
             <div slot="header" class="clearfix">
-              <span>卡片名称</span>
-              <el-button style="float: right; padding: 3px 0" type="text">操作按钮</el-button>
+              <el-link type="primary" :underline="false" style="font-size:1.5em" @click="linkToUsers">用户管理</el-link>
             </div>
             <div v-for="o in 4" :key="o" class="text item">
               {{ '列表内容 ' + o }}
@@ -65,7 +62,7 @@
 
 // import { Subnav } from '../../layout/components'
 export default {
-  name: 'UserManange',
+  name: 'AdminManage',
   // components: {
   //   Subnav
   // },
@@ -78,9 +75,17 @@ export default {
   methods: {
     linkToUsers() {
       this.$router.push({
-        path: '/userManage/users/index',
+        path: '/adminManage/users/index',
         query: {
           t: +new Date() // 保证每次点击路由的query项都是不一样的，确保会重新刷新view
+        }
+      })
+    },
+    linkToGroups() {
+      this.$router.push({
+        path: '/adminManage/groups/index',
+        query: {
+          t: +new Date()
         }
       })
     }
@@ -94,6 +99,6 @@ export default {
   height: 250px;
 }
 .app-container{
-  background: #afafaf47;
+  background: #e5e5e5;
 }
 </style>

@@ -2,84 +2,215 @@
   <div class="app-main">
     <el-divider />
     <el-breadcrumb separator-class="el-icon-arrow-right">
-      <el-breadcrumb-item :to="{ path: '/dashboard' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item :to="{ path: '/userManage/index' }">权限管理</el-breadcrumb-item>
+      <el-breadcrumb-item :to="{ path: '/dashboard' }"><strong>首页</strong></el-breadcrumb-item>
+      <el-breadcrumb-item :to="{ path: '/adminManage/index' }"><strong>权限管理</strong></el-breadcrumb-item>
       <el-breadcrumb-item>用户管理</el-breadcrumb-item>
     </el-breadcrumb>
     <el-divider />
     <div class="app-container">
       <el-form
         :inline="true"
-        :model="queryForm"
-        class="demo-form-inline"
+        :model="searchForm.data"
+        class="app-form app-form-shadow"
       >
-        <el-form-item label="审批人">
-          <el-input v-model="queryForm.user" placeholder="审批人" />
+        <el-form-item label="First Name">
+          <el-input v-model="searchForm.data.first" placeholder="请输入First Name" />
         </el-form-item>
-        <el-form-item label="活动区域">
-          <el-select v-model="queryForm.region" placeholder="活动区域">
-            <el-option
-              label="区域一"
-              value="shanghai"
-            />
-            <el-option
-              label="区域二"
-              value="beijing"
-            />
-          </el-select>
+        <el-form-item label="邮箱">
+          <el-input v-model="searchForm.data.email" placeholder="请输入邮箱" />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="query">查询</el-button>
-          <el-button type="primary" @click="add">新增</el-button>
+          <el-button type="primary" @click="query('query')">查询</el-button>
+        </el-form-item>
+        <el-form-item style="float:right">
+          <el-button icon="el-icon-plus" plain @click="add">新增用户</el-button>
         </el-form-item>
       </el-form>
-      <el-divider />
-      <users-list
-        ref="usersList"
-        :query-form="queryForm"
+
+      <el-table
+        v-loading="loading"
+        :data="tableData"
+        highlight-current-row
+        class="app-table"
+        header-cell-class-name="headercell"
+        stripe
+        height="550"
+        style="width: 100%"
+      >
+        <el-table-column
+          align="center"
+          prop="id"
+          label="ID"
+        />
+        <el-table-column
+          align="center"
+          prop="first"
+          label="first"
+        />
+        <el-table-column
+          align="center"
+          prop="last"
+          label="last"
+        />
+        <el-table-column
+          align="center"
+          prop="email"
+          label="邮箱"
+        />
+        <el-table-column
+          fixed="right"
+          label="操作"
+          align="center"
+          width="100"
+        >
+          <template slot-scope="scope">
+            <el-button
+              type="text"
+              @click="handleUpdate(scope.row)"
+            >编辑</el-button>
+            <el-button
+              type="text"
+              @click="handleDelete(scope.row)"
+            >删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <el-pagination
+        style="float:right"
+        :current-page="searchForm.pageNum"
+        :page-sizes="[10, 20, 30, 50]"
+        :page-size="searchForm.pageSize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="searchForm.total"
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
       />
-      <el-dialog
+      <!-- <el-dialog
         :title="formTitle"
         :visible.sync="formDialog"
-        width="60%"
-        center
+        top="5vh"
+        width="70%"
       >
-        <users-form />
-
-      </el-dialog>
+        <users-form
+          ref="userForm"
+          :form-data="formData"
+        />
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="cancel">取 消</el-button>
+          <el-button type="primary" plain @click="resetForm()">重 置</el-button>
+          <el-button type="primary" @click="submitForm">确 定</el-button>
+        </div>
+      </el-dialog> -->
     </div>
   </div>
 </template>
 
 <script>
-import usersList from './list'
-import usersForm from './form'
+// import usersForm from './form'
 export default {
   name: 'UsersIndex',
-  components: {
-    usersList,
-    usersForm
-  },
+  // components: {
+  //   usersForm
+  // },
   data() {
     return {
-      formTitle: '',
-      formDialog: false,
-      queryForm: {
-        user: '11',
-        region: 'shanghai'
+      // formData: {},
+      // formTitle: '',
+      // formDialog: false,
+      tableData: [],
+      loading: false,
+      searchForm: {
+        data: {
+          first: '',
+          email: ''
+        },
+        pageNum: 1,
+        pageSize: 10,
+        total: 0
       }
     }
   },
   mounted() {
+    this.query()
   },
 
   methods: {
-    query() {},
     add() {
-      this.formTitle = '新增'
-      this.formDialog = true
+      this.$router.push({
+        path: '/adminManage/users/form',
+        query: {
+          t: +new Date()
+        }
+      })
+      // this.formTitle = '新增用户'
+      // this.formDialog = true
+      // this.formData.operate = 'add'
     },
-    handleClick(tab, event) {
+
+    handleSizeChange(val) {
+      this.searchForm.data.pageNum = val
+      this.query()
+    },
+    handleCurrentChange(val) {
+      this.searchForm.data.pageNum = val
+      this.query()
+    },
+    handleUpdate(row) {
+      // this.$router.push({
+      //   path: '/adminManage/users/form',
+      //   query: {
+      //     t: +new Date()
+      //   }
+      // })
+      this.$router.push({ name: 'UsersEdit', params: { ...row }})
+    },
+    handleDelete(row) {
+      this.$confirm('此操作将永久删除这条数据, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          this.$fetch('/ws/admin/user/resource/delete?userId=' + row.id, {}, 'delete')
+            .then(res => {
+              this.query()
+            })
+            .catch(err => {
+              this.$notify.error({
+                title: '错误',
+                message: err
+              })
+            })
+        })
+    },
+    query(val) {
+      this.loading = true
+      if (val === 'query') {
+        this.searchForm.pageNum = 1
+      }
+      this.$fetch('/ws/admin/user/list', { ...this.searchForm }, 'post')
+        .then(res => {
+          if (res.code === '0000') {
+            this.tableData = res.data.data
+            this.searchForm.pageSize = res.data.pageSize
+            this.searchForm.pageNum = res.data.pageNum
+            this.searchForm.total = res.data.total
+            this.loading = false
+          } else {
+            this.$notify.error({
+              title: '错误',
+              message: res.msg
+            })
+            this.loading = false
+          }
+        })
+        .catch(err => {
+          this.$notify.error({
+            title: '错误',
+            message: err
+          })
+          this.loading = false
+        })
     }
   }
 }

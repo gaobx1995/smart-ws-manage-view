@@ -39,15 +39,19 @@ module.exports = {
     // before: require('./mock/mock-server.js')
     proxy: {
       '/collect': {
-        target: 'http://10.15.2.10:25754/',
+        target: 'http://10.15.2.54:8088/',
         changeOrigin: true
       },
       '/plat': {
-        target: 'http://10.15.2.10:25754/',
+        target: 'http://10.15.2.54:8088/',
         changeOrigin: true
       },
       '/api': {
-        target: 'http://10.15.2.10:25754/',
+        target: 'http://10.15.2.54:8088/',
+        changeOrigin: true
+      },
+      '/ws': {
+        target: 'http://10.15.2.10:38379/',
         changeOrigin: true
       }
     }

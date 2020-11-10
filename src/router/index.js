@@ -55,7 +55,7 @@ export const constantRoutes = [
     }]
   },
   {
-    path: '/userManage/users',
+    path: '/adminManage/users',
     hidden: true,
     component: Layout,
     children: [{
@@ -64,10 +64,31 @@ export const constantRoutes = [
       component: () => import('@/views/users/index'),
       meta: { title: '用户管理' }
     }, {
+      path: 'form',
+      name: 'UsersForm',
+      component: () => import('@/views/users/form'),
+      meta: { title: '用户表单' }
+    }, {
+      path: 'edit',
+      name: 'UsersEdit',
+      component: () => import('@/views/users/edit'),
+      meta: { title: '用户编辑' }
+    }]
+  },
+  {
+    path: '/adminManage/groups',
+    hidden: true,
+    component: Layout,
+    children: [{
       path: 'index',
-      name: 'UsersList',
-      component: () => import('@/views/users/list'),
-      meta: { title: '用户列表' }
+      name: 'GroupsIndex',
+      component: () => import('@/views/groups/index'),
+      meta: { title: '组管理' }
+    }, {
+      path: 'list',
+      name: 'GroupsList',
+      component: () => import('@/views/groups/list'),
+      meta: { title: '组列表' }
     }]
   }
 

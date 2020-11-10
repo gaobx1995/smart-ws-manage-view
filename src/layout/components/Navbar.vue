@@ -1,21 +1,6 @@
 <template>
   <div class="navbar">
     <hamburger :is-active="sidebar.opened" class="hamburger-container" @toggleClick="toggleSideBar" />
-    <div style="float:left;margin:-5px">
-      <el-menu
-        background-color="white"
-        text-color="#606266"
-        active-text-color="#155cb5"
-        class="el-menu-demo"
-        mode="horizontal"
-        @select="handleSelect"
-      >
-        <el-menu-item index="1">处理中心</el-menu-item>
-        <el-menu-item index="2">我的工作台</el-menu-item>
-        <el-menu-item index="/dashboard" router>消息中心</el-menu-item>
-        <el-menu-item index="4">订单管理</el-menu-item>
-      </el-menu>
-    </div>
     <div class="right-menu">
       <el-dropdown class="avatar-container" trigger="click">
         <span class="el-dropdown-link" style="cursor:pointer">
@@ -55,9 +40,8 @@ export default {
   },
   methods: {
     handleSelect(key, keyPath) {
-      console.log(key, keyPath)
       this.$router.push({
-        path: '/userManage/users/index',
+        path: '/adminManage/users/index',
         query: {
           t: +new Date() // 保证每次点击路由的query项都是不一样的，确保会重新刷新view
         }
