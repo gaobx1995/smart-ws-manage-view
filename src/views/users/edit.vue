@@ -33,7 +33,6 @@
             </el-menu-item>
           </el-menu>
         </el-col>
-
         <el-col :span="21">
           <div style="max-height:500px;overflow:auto;">
             <user-edit-profile v-if="tabName==='profile'" />
