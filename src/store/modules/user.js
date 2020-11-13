@@ -2,7 +2,7 @@
 import * as utils from '@/utils/auth'
 // import { resetRouter } from '@/router'
 import fetch from '@/utils/fetch'
-import md5 from 'js-md5'
+// import md5 from 'js-md5'
 
 const getDefaultState = () => {
   return {
@@ -32,67 +32,69 @@ const mutations = {
 const actions = {
   // user login
   login({ commit }, userInfo) {
-    const { username, password } = userInfo
-    const encPass = md5(password)
-    const date = new Date()
-    const timestamp =
-      '' +
-      (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) +
-      (date.getMinutes() < 10
-        ? '0' + date.getMinutes()
-        : date.getMinutes()) +
-      (date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds())
+    const { userId, password } = userInfo
+    // const encPass = md5(password)
+    // const date = new Date()
+    // const timestamp =
+    //   '' +
+    //   (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) +
+    //   (date.getMinutes() < 10
+    //     ? '0' + date.getMinutes()
+    //     : date.getMinutes()) +
+    //   (date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds())
     return new Promise((resolve, reject) => {
-      fetch('/plat/auth/token', {
-        loginName: username,
-        password: timestamp + encPass,
-        captcha: 'string' })
+      fetch('/ws/admin/auth/token', {
+        userId: userId,
+        // password: timestamp + encPass,
+        password: password
+        // captcha: 'string'
+      })
         .then(response => {
           if (response.code === '200') {
             commit('SET_NAME', response.data.username)
             commit('SET_TOKEN', response.data.token)
-            if (username !== utils.getLoginInfo('zy-netuser-id')) {
+            if (userId !== utils.getLoginInfo('zy-netuser-id')) {
               sessionStorage.clear()
             }
             utils.setToken(response.data.token)
             utils.setLoginInfo({
-              tempFlag: '1',
-              zy_token: response.data.token,
-              'zy-user-id': response.data.userId,
-              'zy-user-type': response.data?.userType || '',
-              'zy-netuser-id': response.data.netuserId,
-              'zy-prv-id': response.data?.prvId || '',
-              'zy-prv-name': response.data?.prvName || '',
-              'zy-prv-code': response.data?.defaultProv?.prvCode || '',
-              'zy-reg-id': response.data?.regId || '',
-              'zy-reg-name': response.data?.regName || '',
-              'zy-region-full-code': response.data?.defaultRegion?.regFullCode || '',
-              'zy-region-full-name': response.data?.defaultRegion?.regFullName || '',
-              'zy-team-full-code': response.data?.defaulteam?.teamFullCode || '',
-              'zy-factory-code':
-                response.data.teams &&
-                response.data.teams.length &&
-                response.data.teams.some(item => {
-                  return item.typecode === 'factory'
-                })
-                  ? response.data.teams.filter(item => {
-                    return item.typecode === 'factory'
-                  })[0].code
-                  : '',
-              'zy-user-email': response.data?.email || '',
-              'zy-user-mobile': response.data?.mobilephone || '',
-              'zy-user-teams': response.data.teams
-                ? JSON.stringify(response.data.teams)
-                : '',
-              'zy-user-groupList': response.data.grps
-                ? JSON.stringify(response.data.grps)
-                : '',
-              'zy-company-name': response.data.companyName,
-              'zy-company-code': response.data.companyCode,
-              'zy-dept-id': response?.defaultDept?.depId || '',
-              'zy-dept-name': response?.defaultDept?.depName || ''
+              // tempFlag: '1',
+              // zy_token: response.data.token,
+              // 'zy-user-id': response.data.userId,
+              // 'zy-user-type': response.data?.userType || '',
+              // 'zy-netuser-id': response.data.netuserId,
+              // 'zy-prv-id': response.data?.prvId || '',
+              // 'zy-prv-name': response.data?.prvName || '',
+              // 'zy-prv-code': response.data?.defaultProv?.prvCode || '',
+              // 'zy-reg-id': response.data?.regId || '',
+              // 'zy-reg-name': response.data?.regName || '',
+              // 'zy-region-full-code': response.data?.defaultRegion?.regFullCode || '',
+              // 'zy-region-full-name': response.data?.defaultRegion?.regFullName || '',
+              // 'zy-team-full-code': response.data?.defaulteam?.teamFullCode || '',
+              // 'zy-factory-code':
+              //   response.data.teams &&
+              //   response.data.teams.length &&
+              //   response.data.teams.some(item => {
+              //     return item.typecode === 'factory'
+              //   })
+              //     ? response.data.teams.filter(item => {
+              //       return item.typecode === 'factory'
+              //     })[0].code
+              //     : '',
+              // 'zy-user-email': response.data?.email || '',
+              // 'zy-user-mobile': response.data?.mobilephone || '',
+              // 'zy-user-teams': response.data.teams
+              //   ? JSON.stringify(response.data.teams)
+              //   : '',
+              // 'zy-user-groupList': response.data.grps
+              //   ? JSON.stringify(response.data.grps)
+              //   : '',
+              // 'zy-company-name': response.data.companyName,
+              // 'zy-company-code': response.data.companyCode,
+              // 'zy-dept-id': response?.defaultDept?.depId || '',
+              // 'zy-dept-name': response?.defaultDept?.depName || ''
             })
-            fetch('/plat/auth/user/getUserByNetuserid', { netuserid: username })
+            fetch('/ws/admin/auth/getUserInfoByToken?token=' + response.data.token, {}, 'get')
               .then(res => {
                 if (res.code === '200') {
                   utils.setLoginInfo({

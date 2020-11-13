@@ -94,9 +94,9 @@ export default {
       },
       rules: {
         email: [{ required: true, message: '请输入邮箱', trigger: 'blur' }, { validator: emailValid, trigger: 'blur' }],
-        first: [{ required: true, message: '请输入first', trigger: 'blur' }],
-        last: [{ required: true, message: '请输入last', trigger: 'blur' }],
-        id: [{ required: true, message: '请输入id', trigger: 'blur' }],
+        first: [{ required: true, message: '请输入First Name', trigger: 'blur' }],
+        last: [{ required: true, message: '请输入Last Name', trigger: 'blur' }],
+        id: [{ required: true, message: '请输入ID', trigger: 'blur' }],
         pass: [{ required: true, message: '请输入密码', trigger: 'blur' }, { validator: validatePass, trigger: 'blur' }],
         checkPass: [{ required: true, message: '请输入确认密码', trigger: 'blur' }, { validator: validatePass2, trigger: 'blur' }]
       }

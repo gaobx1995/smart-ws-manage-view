@@ -12,6 +12,19 @@ const install = Vue => {
   Vue.prototype.$fetch = fetch
   Vue.prototype.$utils = allUtils
   Vue.prototype._ = _
+
+  Vue.mixin({
+    methods: {
+      $errorTip(error) {
+        this.$message({
+          message: error,
+          type: 'error',
+          duration: 30000,
+          showClose: true
+        })
+      }
+    }
+  })
 }
 
 if (typeof window !== 'undefined' && window.Vue) {

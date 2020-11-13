@@ -12,10 +12,40 @@
     </el-breadcrumb>
     <el-divider />
     <div class="app-container">
-      <el-tabs
+      <el-row>
+        <el-col :span="3">
+          <el-menu
+            default-active="profile"
+            class="el-menu-vertical-demo"
+            @select="handleSelect"
+          >
+            <el-menu-item index="profile">
+              <span slot="title">用户简介</span>
+            </el-menu-item>
+            <el-menu-item index="account">
+              <span slot="title">账户管理</span>
+            </el-menu-item>
+            <el-menu-item index="groups">
+              <span slot="title">组管理</span>
+            </el-menu-item>
+            <el-menu-item index="tenants">
+              <span slot="title">租户管理</span>
+            </el-menu-item>
+          </el-menu>
+        </el-col>
+
+        <el-col :span="21">
+          <div style="max-height:500px;overflow:auto;">
+            <user-edit-profile v-if="tabName==='profile'" />
+            <user-edit-account v-if="tabName==='account'" />
+            <user-edit-groups v-if="tabName==='groups'" />
+            <user-edit-tenants v-if="tabName==='tenants'" />
+          </div>
+        </el-col>
+      </el-row>
+      <!-- <el-tabs
         v-model="activeName"
         tab-position="left"
-        style="height: 480px"
         @tab-click="tabClick"
       >
         <el-tab-pane
@@ -25,24 +55,24 @@
           <user-edit-profile v-if="tabName==='profile'" />
         </el-tab-pane>
         <el-tab-pane
-          label="配置管理"
+          label="账户管理"
           name="account"
         >
           <user-edit-account v-if="tabName==='account'" />
         </el-tab-pane>
         <el-tab-pane
-          label="角色管理"
+          label="组管理"
           name="groups"
         >
           <user-edit-groups v-if="tabName==='groups'" />
         </el-tab-pane>
         <el-tab-pane
-          label="定时任务补偿"
+          label="租户管理"
           name="tenants"
         >
           <user-edit-tenants v-if="tabName==='tenants'" />
         </el-tab-pane>
-      </el-tabs>
+      </el-tabs> -->
     </div>
   </div>
 </template>
@@ -67,11 +97,15 @@ export default {
     }
   },
   mounted() {
+    this.handleSelect('profile')
     // this.userProfile = { ...this.userProfile, ...this.$route.params }
   },
   methods: {
     tabClick(tab, event) {
       this.tabName = tab.name
+    },
+    handleSelect(val) {
+      this.tabName = val
     }
   }
 }

@@ -6,7 +6,7 @@ import store from '@/store'
 // 请求拦截器
 axios.interceptors.request.use(
   config => {
-    // config.headers['zy_token'] = getToken()
+    config.headers['zy_token'] = getToken()
     config.headers['x-csrf-token'] = getCsrfToken()
     config.headers['Cache-Control'] = 'no-cache'
     config.headers['Pragma'] = 'no-cache'

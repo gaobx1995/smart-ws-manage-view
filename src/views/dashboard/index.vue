@@ -108,9 +108,9 @@ export default {
   cursor: pointer;
 }
 .app-name{
-   font-size:2em;
+   font-size:1.5em;
    color: #155cb5;
-   margin: 0 10px;
+   margin: 0 20px;
    cursor: pointer;
 }
 </style>

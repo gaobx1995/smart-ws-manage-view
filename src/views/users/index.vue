@@ -34,7 +34,7 @@
         class="app-table"
         header-cell-class-name="headercell"
         stripe
-        height="550"
+        max-height="550"
         style="width: 100%"
       >
         <el-table-column
@@ -85,38 +85,15 @@
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
       />
-      <!-- <el-dialog
-        :title="formTitle"
-        :visible.sync="formDialog"
-        top="5vh"
-        width="70%"
-      >
-        <users-form
-          ref="userForm"
-          :form-data="formData"
-        />
-        <div slot="footer" class="dialog-footer">
-          <el-button @click="cancel">取 消</el-button>
-          <el-button type="primary" plain @click="resetForm()">重 置</el-button>
-          <el-button type="primary" @click="submitForm">确 定</el-button>
-        </div>
-      </el-dialog> -->
     </div>
   </div>
 </template>
 
 <script>
-// import usersForm from './form'
 export default {
   name: 'UsersIndex',
-  // components: {
-  //   usersForm
-  // },
   data() {
     return {
-      // formData: {},
-      // formTitle: '',
-      // formDialog: false,
       tableData: [],
       loading: false,
       searchForm: {
@@ -142,9 +119,6 @@ export default {
           t: +new Date()
         }
       })
-      // this.formTitle = '新增用户'
-      // this.formDialog = true
-      // this.formData.operate = 'add'
     },
 
     handleSizeChange(val) {
@@ -156,12 +130,6 @@ export default {
       this.query()
     },
     handleUpdate(row) {
-      // this.$router.push({
-      //   path: '/adminManage/users/form',
-      //   query: {
-      //     t: +new Date()
-      //   }
-      // })
       this.$router.push({ name: 'UsersEdit', params: { ...row }})
     },
     handleDelete(row) {
@@ -229,10 +197,6 @@ export default {
   padding: 9px 10px 0 10px;
   height: 35px;
 }
-// .app-container {
-//   margin: 0;
-//   background: #ffffff;
-// }
 .app-main{
    background: #ffffff;
 }
