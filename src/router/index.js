@@ -85,10 +85,15 @@ export const constantRoutes = [
       component: () => import('@/views/groups/index'),
       meta: { title: '组管理' }
     }, {
-      path: 'list',
-      name: 'GroupsList',
-      component: () => import('@/views/groups/list'),
-      meta: { title: '组列表' }
+      path: 'form',
+      name: 'GroupsForm',
+      component: () => import('@/views/groups/form'),
+      meta: { title: '组表单' }
+    }, {
+      path: 'edit',
+      name: 'GroupsEdit',
+      component: () => import('@/views/groups/edit'),
+      meta: { title: '组编辑' }
     }]
   }
 

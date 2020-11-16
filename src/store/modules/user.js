@@ -60,7 +60,7 @@ const actions = {
             utils.setLoginInfo({
               // tempFlag: '1',
               // zy_token: response.data.token,
-              // 'zy-user-id': response.data.userId,
+              'zy-user-id': response.data.id
               // 'zy-user-type': response.data?.userType || '',
               // 'zy-netuser-id': response.data.netuserId,
               // 'zy-prv-id': response.data?.prvId || '',

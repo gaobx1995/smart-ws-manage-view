@@ -68,10 +68,10 @@
               type="text"
               @click="handleUpdate(scope.row)"
             >编辑</el-button>
-            <el-button
+            <!-- <el-button
               type="text"
               @click="handleDelete(scope.row)"
-            >删除</el-button>
+            >删除</el-button> -->
           </template>
         </el-table-column>
       </el-table>
@@ -122,11 +122,11 @@ export default {
     },
 
     handleSizeChange(val) {
-      this.searchForm.data.pageNum = val
+      this.searchForm.pageNum = val
       this.query()
     },
     handleCurrentChange(val) {
-      this.searchForm.data.pageNum = val
+      this.searchForm.pageNum = val
       this.query()
     },
     handleUpdate(row) {
