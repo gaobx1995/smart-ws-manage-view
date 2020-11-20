@@ -1,14 +1,15 @@
 <template>
   <div class="app-main">
-    <el-divider />
-    <el-breadcrumb separator-class="el-icon-arrow-right">
+    <el-divider v-if="!operGroup" />
+    <el-breadcrumb v-if="!operGroup" separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/dashboard' }"><strong>首页</strong></el-breadcrumb-item>
       <el-breadcrumb-item :to="{ path: '/adminManage/index' }"><strong>权限管理</strong></el-breadcrumb-item>
       <el-breadcrumb-item>用户管理</el-breadcrumb-item>
     </el-breadcrumb>
-    <el-divider />
+    <el-divider v-if="!operGroup" />
     <div class="app-container">
       <el-form
+        v-if="!operGroup"
         :inline="true"
         :model="searchForm.data"
         class="app-form app-form-shadow"
@@ -23,7 +24,7 @@
           <el-button type="primary" @click="query('query')">查询</el-button>
         </el-form-item>
         <el-form-item style="float:right">
-          <el-button icon="el-icon-plus" plain @click="add">新增用户</el-button>
+          <el-button icon="el-icon-plus" plain @click="add">创建用户</el-button>
         </el-form-item>
       </el-form>
 
@@ -58,6 +59,7 @@
           label="邮箱"
         />
         <el-table-column
+          v-if="!operGroup"
           fixed="right"
           label="操作"
           align="center"
@@ -92,6 +94,16 @@
 <script>
 export default {
   name: 'UsersIndex',
+  props: {
+    operGroup: {
+      type: Boolean,
+      default: false
+    },
+    operGroupId: { // 组ID
+      type: String,
+      default: ''
+    }
+  },
   data() {
     return {
       tableData: [],
@@ -122,7 +134,7 @@ export default {
     },
 
     handleSizeChange(val) {
-      this.searchForm.pageNum = val
+      this.searchForm.pageSize = val
       this.query()
     },
     handleCurrentChange(val) {
@@ -130,7 +142,13 @@ export default {
       this.query()
     },
     handleUpdate(row) {
-      this.$router.push({ name: 'UsersEdit', params: { ...row }})
+      this.$router.push({
+        path: '/adminManage/users/edit',
+        query: {
+          id: row.id,
+          t: +new Date()
+        }
+      })
     },
     handleDelete(row) {
       this.$confirm('此操作将永久删除这条数据, 是否继续?', '提示', {
@@ -155,6 +173,9 @@ export default {
       this.loading = true
       if (val === 'query') {
         this.searchForm.pageNum = 1
+      }
+      if (this.operGroup) { // group查询
+        this.searchForm.data.groupId = this.operGroupId
       }
       this.$fetch('/ws/admin/user/list', { ...this.searchForm }, 'post')
         .then(res => {

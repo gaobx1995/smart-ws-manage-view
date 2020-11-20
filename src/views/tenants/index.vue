@@ -1,15 +1,15 @@
 <template>
   <div class="app-main">
-    <el-divider v-if="!operUserGroup" />
-    <el-breadcrumb v-if="!operUserGroup" separator-class="el-icon-arrow-right">
+    <el-divider v-if="!operTenant" />
+    <el-breadcrumb v-if="!operTenant" separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/dashboard' }"><strong>首页</strong></el-breadcrumb-item>
       <el-breadcrumb-item :to="{ path: '/adminManage/index' }"><strong>权限管理</strong></el-breadcrumb-item>
-      <el-breadcrumb-item>组管理</el-breadcrumb-item>
+      <el-breadcrumb-item>租户管理</el-breadcrumb-item>
     </el-breadcrumb>
-    <el-divider v-if="!operUserGroup" />
+    <el-divider v-if="!operTenant" />
     <div class="app-container">
       <el-form
-        v-if="!operUserGroup"
+        v-if="!operTenant"
         :inline="true"
         :model="searchForm.data"
         class="app-form app-form-shadow"
@@ -20,14 +20,11 @@
         <el-form-item label="名称">
           <el-input v-model="searchForm.data.nameLike" placeholder="请输入名称" />
         </el-form-item>
-        <el-form-item label="类型">
-          <el-input v-model="searchForm.data.type" placeholder="请输入类型" />
-        </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="query('query')">查询</el-button>
         </el-form-item>
         <el-form-item style="float:right">
-          <el-button icon="el-icon-plus" plain @click="add">创建组</el-button>
+          <el-button icon="el-icon-plus" plain @click="add">创建租户</el-button>
         </el-form-item>
       </el-form>
 
@@ -40,12 +37,12 @@
         class="app-table"
         header-cell-class-name="headercell"
         stripe
-        :max-height="selUserGroup?'300':operUserGroup?'1000':'550'"
+        :max-height="selUserTenant?'300':operTenant?'1000':'550'"
         style="width: 100%"
         @selection-change="handleSelectionChange"
       >
         <el-table-column
-          v-if="selUserGroup"
+          v-if="selUserTenant || selGroupTenant"
           :reserve-selection="true"
           align="center"
           type="selection"
@@ -61,27 +58,26 @@
           label="名称"
         />
         <el-table-column
-          align="center"
-          prop="type"
-          label="类型"
-        />
-        <el-table-column
-          v-if="!selUserGroup"
+          v-if="!selUserTenant&&!selGroupTenant"
           fixed="right"
           label="操作"
           align="center"
-          width="100"
         >
           <template slot-scope="scope">
             <el-button
-              v-if="!operUserGroup"
+              v-if="!operTenant"
               type="text"
               @click="handleUpdate(scope.row)"
             >编辑</el-button>
             <el-button
-              v-if="operUserGroup"
+              v-if="operUserId"
               type="text"
-              @click="removeUserGroup(scope.row)"
+              @click="removeUserTenant(scope.row)"
+            >移除</el-button>
+            <el-button
+              v-if="operGroupId"
+              type="text"
+              @click="removeGroupTenant(scope.row)"
             >移除</el-button>
           </template>
         </el-table-column>
@@ -102,17 +98,33 @@
 
 <script>
 export default {
-  name: 'GroupsIndex',
+  name: 'TenantsIndex',
   props: {
-    operUserGroup: {
+    operTenant: { // 编辑操作
       type: Boolean,
       default: false
     },
-    selUserGroup: {
+    operUserTenant: { // 用户
       type: Boolean,
       default: false
     },
-    operUserId: {
+    selUserTenant: { // 用户勾选
+      type: Boolean,
+      default: false
+    },
+    operUserId: { // 用户ID
+      type: String,
+      default: ''
+    },
+    operGroupTenant: { // 组
+      type: Boolean,
+      default: false
+    },
+    selGroupTenant: { // 组勾选
+      type: Boolean,
+      default: false
+    },
+    operGroupId: { // 组ID
       type: String,
       default: ''
     }
@@ -125,7 +137,6 @@ export default {
         data: {
           id: '',
           nameLike: '',
-          type: '',
           userId: ''
         },
         pageNum: 1,
@@ -137,23 +148,21 @@ export default {
   mounted() {
     this.query()
   },
-
   methods: {
     getRowKeys(row) {
       return row.id
     },
     handleSelectionChange(val) {
-      this.$emit('selGroup', val)
+      this.$emit('selTenant', val)
     },
     add() {
       this.$router.push({
-        path: '/adminManage/groups/form',
+        path: '/adminManage/tenants/form',
         query: {
           t: +new Date()
         }
       })
     },
-
     handleSizeChange(val) {
       this.searchForm.pageSize = val
       this.query()
@@ -164,25 +173,62 @@ export default {
     },
     handleUpdate(row) {
       this.$router.push({
-        path: '/adminManage/groups/edit',
+        path: '/adminManage/tenants/edit',
         query: {
           id: row.id,
           t: +new Date()
         }
       })
     },
-    removeUserGroup(row) {
+    removeGroupTenant(row) {
       this.$confirm('此操作将永久删除这条数据, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       })
         .then(() => {
-          this.$fetch('/ws/admin/group/resource/membership/delete?groupId=' + row.id + '&userId=' + this.operUserId,
+          this.$fetch('/ws/admin/tenant/resource/member/deleteGroupShip?groupId=' + this.operGroupId + '&tenantId=' + row.id,
             {}, 'delete')
             .then(res => {
               if (res.code === '0000') {
                 this.query()
+                this.$notify({
+                  title: '成功',
+                  message: '操作成功',
+                  type: 'success'
+                })
+              } else {
+                this.$notify.error({
+                  title: '错误',
+                  message: res.msg
+                })
+              }
+            })
+            .catch(err => {
+              this.$notify.error({
+                title: '错误',
+                message: err
+              })
+            })
+        })
+    },
+    removeUserTenant(row) {
+      this.$confirm('此操作将永久删除这条数据, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          this.$fetch('/ws/admin/tenant/resource/member/deleteUserShip?tenantId=' + row.id + '&userId=' + this.operUserId,
+            {}, 'delete')
+            .then(res => {
+              if (res.code === '0000') {
+                this.query()
+                this.$notify({
+                  title: '成功',
+                  message: '操作成功',
+                  type: 'success'
+                })
               } else {
                 this.$notify.error({
                   title: '错误',
@@ -200,15 +246,20 @@ export default {
     },
     query(val) {
       this.loading = true
-      if (val === 'query') {
+      if (val === 'query') { // 保证点击查询在第一页
         this.searchForm.pageNum = 1
       }
-      if (this.operUserGroup && !this.selUserGroup) {
+      if (this.operUserTenant && !this.selUserTenant) { // user租户查询
         this.searchForm.data.userId = this.operUserId
-      } else if (this.operUserGroup && this.selUserGroup) {
+      } else if (this.operUserTenant && this.selUserTenant) {
         this.searchForm.data.excludeUserId = this.operUserId
       }
-      this.$fetch('/ws/admin/group/list', { ...this.searchForm }, 'post')
+      if (this.operGroupTenant && !this.selGroupTenant) { // group租户查询
+        this.searchForm.data.groupId = this.operGroupId
+      } else if (this.operGroupTenant && this.selGroupTenant) {
+        this.searchForm.data.excludeGroupId = this.operGroupId
+      }
+      this.$fetch('/ws/admin/tenant/list', { ...this.searchForm }, 'post')
         .then(res => {
           if (res.code === '0000') {
             this.tableData = res.data.data

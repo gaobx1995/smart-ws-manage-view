@@ -9,8 +9,8 @@
       class="app-form"
     >
       <el-row class="row-1">
-        <h3 class="tipFont" style="font-size: 24px">编辑用户</h3>
-        <h4 class="tipFont" style="font-size: 18px">修改密码</h4>
+        <!-- <h3 class="tipFont" style="font-size: 24px">编辑用户</h3> -->
+        <h4 class="tipFont" style="font-size: 18px">修改{{ userAccount.first }} {{ userAccount.last }}密码</h4>
         <p class="tipFont" style="font-size: 15px">输入新密码以更改现有帐户密码</p>
         <el-form-item label="登录人密码" prop="authUserPwd">
           <el-input v-model="userForm.authUserPwd" placeholder="请输入登录人密码" />
@@ -23,7 +23,7 @@
         </el-form-item>
         <el-form-item style="text-align:right;">
           <el-button @click="resetForm('userForm')">重置</el-button>
-          <el-button type="primary" @click="submitForm('userForm')">修改用户简介</el-button>
+          <el-button type="primary" @click="submitForm('userForm')">修改用户密码</el-button>
         </el-form-item>
         <h4 class="tipFont" style="font-size: 18px">删除用户</h4>
         <h3 class="tipFont" style="font-size: 15px"><el-alert title="警告:删除用户无法撤消！" :closable="false" type="error" /></h3>
@@ -34,7 +34,7 @@
         <h4 class="tipFont" style="font-size: 18px">解锁用户</h4>
         <h3 class="tipFont" style="font-size: 15px"><el-alert title="注意:只有当用户被锁定时才相关!" :closable="false" type="info" /></h3>
         <el-form-item style="text-align:right;">
-          <el-button style="float:right" type="success" icon="el-icon-lock" @click="deleteUser">删除用户</el-button>
+          <el-button style="float:right" type="success" icon="el-icon-lock" @click="unlockUser">解锁用户</el-button>
         </el-form-item>
       </el-row>
     </el-form>
@@ -44,6 +44,14 @@
 <script>
 export default {
   name: 'UsersEditAccount',
+  props: {
+    userInfo: {
+      type: Object,
+      default: () => {
+        return {}
+      }
+    }
+  },
   data() {
     var validatePass = (rule, value, callback) => {
       if (value === '') {
@@ -65,7 +73,12 @@ export default {
       }
     }
     return {
-      userId: '',
+      userAccount: {
+        id: '',
+        first: '',
+        last: '',
+        email: ''
+      },
       userForm: {
         authUserPwd: '',
         pass: '',
@@ -79,11 +92,52 @@ export default {
       }
     }
   },
-  mounted() {
-    this.userForm.userId = this.$route.params.id
-    this.userId = this.$route.params.id
+  watch: {
+    userInfo: {
+      handler(obj) {
+        this.userAccount = obj
+      },
+      immediate: true,
+      deep: true
+    }
+  },
+  created() {
+    this.userForm.userId = this.$route.query.id
+    this.userAccount.id = this.$route.query.id
   },
   methods: {
+    toUserIndex() {
+      this.$router.push({
+        path: '/adminManage/users/index',
+        query: {
+          t: +new Date()
+        }
+      })
+    },
+    unlockUser() {
+      this.$fetch('/ws/admin/user/resource/unlock?userId=' + this.userAccount.id, {}, 'post')
+        .then(res => {
+          if (res.code === '0000') {
+            this.$notify({
+              title: '成功',
+              message: '操作成功',
+              type: 'success'
+            })
+            this.toUserIndex()
+          } else {
+            this.$notify.error({
+              title: '错误',
+              message: res.msg
+            })
+          }
+        })
+        .catch(err => {
+          this.$notify.error({
+            title: '错误',
+            message: err
+          })
+        })
+    },
     resetForm(formName) {
       this.$refs[formName].resetFields()
     },
@@ -94,9 +148,21 @@ export default {
         type: 'warning'
       })
         .then(() => {
-          this.$fetch('/ws/admin/user/resource/delete?userId=' + this.userId, {}, 'delete')
+          this.$fetch('/ws/admin/user/resource/delete?userId=' + this.userAccount.id, {}, 'delete')
             .then(res => {
-              this.query()
+              if (res.code === '0000') {
+                this.$notify({
+                  title: '成功',
+                  message: '操作成功',
+                  type: 'success'
+                })
+                this.toUserIndex()
+              } else {
+                this.$notify.error({
+                  title: '错误',
+                  message: res.msg
+                })
+              }
             })
             .catch(err => {
               this.$notify.error({
@@ -116,7 +182,7 @@ export default {
                 message: '操作成功',
                 type: 'success'
               })
-              this.toAdminManage()
+              this.toUserIndex()
             })
             .catch(err => {
               this.$notify.error({

@@ -23,7 +23,7 @@
         <h4 class="tipFont" style="font-size: 18px">删除组</h4>
         <h3 class="tipFont" style="font-size: 15px"><el-alert title="警告:删除组无法撤消！" :closable="false" type="error" /></h3>
         <el-form-item style="text-align:right;">
-          <el-button style="float:right" type="danger" @click="deleteGroup">删除租</el-button>
+          <el-button style="float:right" type="danger" @click="deleteGroup">删除组</el-button>
         </el-form-item>
       </el-row>
     </el-form>
@@ -33,6 +33,14 @@
 <script>
 export default {
   name: 'GroupsEditInformation',
+  props: {
+    groupInfo: {
+      type: Object,
+      default: () => {
+        return {}
+      }
+    }
+  },
   data() {
     return {
       groupId: '',
@@ -47,11 +55,27 @@ export default {
       }
     }
   },
-  mounted() {
-    this.groupId = this.$route.params.id
-    this.groupForm = { ...this.groupForm, ...this.$route.params }
+  watch: {
+    groupInfo: {
+      handler(obj) {
+        this.groupForm = obj
+      },
+      immediate: true,
+      deep: true
+    }
+  },
+  created() {
+    this.groupId = this.$route.query.id
   },
   methods: {
+    toGroupIndex() {
+      this.$router.push({
+        path: '/adminManage/groups/index',
+        query: {
+          t: +new Date()
+        }
+      })
+    },
     deleteGroup() {
       this.$confirm('此操作将永久删除这条数据, 是否继续?', '提示', {
         confirmButtonText: '确定',
@@ -61,12 +85,19 @@ export default {
         .then(() => {
           this.$fetch('/ws/admin/group/resource/delete?groupId=' + this.groupId, {}, 'delete')
             .then(res => {
-              this.$router.push({
-                path: '/adminManage/groups/index',
-                query: {
-                  t: +new Date()
-                }
-              })
+              if (res.code === '0000') {
+                this.$notify({
+                  title: '成功',
+                  message: '操作成功',
+                  type: 'success'
+                })
+                this.toGroupIndex()
+              } else {
+                this.$notify.error({
+                  title: '错误',
+                  message: res.msg
+                })
+              }
             })
             .catch(err => {
               this.$notify.error({
@@ -79,14 +110,20 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.$fetch('/ws/admin/group/resource/updateProfile', { ...this.groupForm }, 'post')
+          this.$fetch('/ws/admin/group/resource/updateProfile', { ...this.groupForm }, 'put')
             .then(res => {
-              this.$notify({
-                title: '成功',
-                message: '操作成功',
-                type: 'success'
-              })
-              this.toAdminManage()
+              if (res.code === '0000') {
+                this.$notify({
+                  title: '成功',
+                  message: '操作成功',
+                  type: 'success'
+                })
+              } else {
+                this.$notify.error({
+                  title: '错误',
+                  message: res.msg
+                })
+              }
             })
             .catch(err => {
               this.$notify.error({

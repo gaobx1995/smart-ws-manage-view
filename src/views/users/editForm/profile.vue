@@ -11,7 +11,7 @@
       <el-row class="row-1">
         <h3
           style="margin: 0px 0 20px 0;font-weight: 400;font-size: 24px;color: #555;"
-        >用户简介</h3>
+        >用户{{ userForm.first }} {{ userForm.last }}简介</h3>
         <el-form-item label="First Name" prop="first">
           <el-input v-model="userForm.first" placeholder="请输入First Name" />
         </el-form-item>
@@ -34,6 +34,14 @@
 <script>
 export default {
   name: 'UsersEditProfile',
+  props: {
+    userInfo: {
+      type: Object,
+      default: () => {
+        return {}
+      }
+    }
+  },
   data() {
     const emailValid = (rule, value, callbac) => {
       const myreg = /^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$/
@@ -45,6 +53,7 @@ export default {
     }
     return {
       userForm: {
+        id: '',
         email: '',
         first: '',
         last: ''
@@ -56,21 +65,35 @@ export default {
       }
     }
   },
-  mounted() {
-    this.userForm = { ...this.userForm, ...this.$route.params }
+  watch: {
+    userInfo: {
+      handler(obj) {
+        this.userForm = obj
+      },
+      immediate: true,
+      deep: true
+    }
+  },
+  created() {
   },
   methods: {
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.$fetch('/ws/admin/user/resource/updateProfile', { ...this.userForm }, 'post')
+          this.$fetch('/ws/admin/user/resource/updateProfile', { ...this.userForm }, 'put')
             .then(res => {
-              this.$notify({
-                title: '成功',
-                message: '操作成功',
-                type: 'success'
-              })
-              this.toAdminManage()
+              if (res.code === '0000') {
+                this.$notify({
+                  title: '成功',
+                  message: '操作成功',
+                  type: 'success'
+                })
+              } else {
+                this.$notify.error({
+                  title: '错误',
+                  message: res.msg
+                })
+              }
             })
             .catch(err => {
               this.$notify.error({

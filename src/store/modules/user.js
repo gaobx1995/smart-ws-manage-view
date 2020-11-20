@@ -57,10 +57,20 @@ const actions = {
               sessionStorage.clear()
             }
             utils.setToken(response.data.token)
+            console.log(response.data)
             utils.setLoginInfo({
               // tempFlag: '1',
               // zy_token: response.data.token,
-              'zy-user-id': response.data.id
+              'zy-user-id': response.data.id,
+              'zy-user-email': response.data?.email || '',
+              'zy-user-first': response.data?.first || '',
+              'zy-user-last': response.data?.last || '',
+              'zy-user-groupList': response.data.groupList
+                ? JSON.stringify(response.data.groupList)
+                : '',
+              'zy-user-tenantList': response.data.tenantList
+                ? JSON.stringify(response.data.tenantList)
+                : ''
               // 'zy-user-type': response.data?.userType || '',
               // 'zy-netuser-id': response.data.netuserId,
               // 'zy-prv-id': response.data?.prvId || '',
@@ -81,7 +91,6 @@ const actions = {
               //       return item.typecode === 'factory'
               //     })[0].code
               //     : '',
-              // 'zy-user-email': response.data?.email || '',
               // 'zy-user-mobile': response.data?.mobilephone || '',
               // 'zy-user-teams': response.data.teams
               //   ? JSON.stringify(response.data.teams)

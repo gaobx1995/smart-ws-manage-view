@@ -4,8 +4,8 @@
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/dashboard' }"><strong>首页</strong></el-breadcrumb-item>
       <el-breadcrumb-item :to="{ path: '/adminManage/index' }"><strong>权限管理</strong></el-breadcrumb-item>
-      <el-breadcrumb-item :to="{ path: '/adminManage/users/index' }"><strong>用户管理</strong></el-breadcrumb-item>
-      <el-breadcrumb-item>编辑用户</el-breadcrumb-item>
+      <el-breadcrumb-item :to="{ path: '/adminManage/tenants/index' }"><strong>租户管理</strong></el-breadcrumb-item>
+      <el-breadcrumb-item>编辑租户</el-breadcrumb-item>
     </el-breadcrumb>
     <el-divider />
     <div class="app-container">
@@ -16,26 +16,22 @@
             class="el-menu-vertical-demo"
             @select="handleSelect"
           >
-            <el-menu-item index="profile">
-              <span slot="title">用户简介</span>
-            </el-menu-item>
-            <el-menu-item index="account">
-              <span slot="title">账户管理</span>
+            <el-menu-item index="information">
+              <span slot="title">基本信息</span>
             </el-menu-item>
             <el-menu-item index="groups">
               <span slot="title">组管理</span>
             </el-menu-item>
-            <el-menu-item index="tenants">
-              <span slot="title">租户管理</span>
+            <el-menu-item index="userManage">
+              <span slot="title">用户管理</span>
             </el-menu-item>
           </el-menu>
         </el-col>
         <el-col :span="21">
           <div style="max-height:500px;overflow:auto;">
-            <user-edit-profile v-if="tabName==='profile'" :user-info="userInfo" />
-            <user-edit-account v-if="tabName==='account'" :user-info="userInfo" />
-            <user-edit-groups v-if="tabName==='groups'" :user-info="userInfo" />
-            <user-edit-tenants v-if="tabName==='tenants'" :user-info="userInfo" />
+            <tenant-edit-information v-if="tabName==='information'" :tenant-info="tenantInfo" />
+            <tenant-edit-groups v-if="tabName==='groups'" :tenant-info="tenantInfo" />
+            <tenant-edit-users v-if="tabName==='userManage'" :tenant-info="tenantInfo" />
           </div>
         </el-col>
       </el-row>
@@ -44,43 +40,36 @@
 </template>
 
 <script>
-import userEditProfile from './editForm/profile'
-import userEditAccount from './editForm/account'
-import userEditGroups from './editForm/groups'
-import userEditTenants from './editForm/tenants'
+import tenantEditGroups from './editForm/groups'
+import tenantEditInformation from './editForm/information'
+import tenantEditUsers from './editForm/users'
 export default {
-  name: 'UsersEdit',
+  name: 'TenantsEdit',
   components: {
-    userEditProfile,
-    userEditAccount,
-    userEditGroups,
-    userEditTenants
+    tenantEditInformation,
+    tenantEditUsers,
+    tenantEditGroups
   },
   data() {
     return {
-      activeName: 'profile',
-      tabName: 'profile',
-      userInfo: {
-        id: '',
-        email: '',
-        first: '',
-        last: ''
-      }
+      activeName: 'information',
+      tabName: 'information',
+      tenantInfo: {}
     }
   },
   mounted() {
-    this.handleSelect('profile')
+    this.handleSelect('information')
   },
   methods: {
     handleSelect(val) {
       this.tabName = val
-      this.getUserInfo()
+      this.getTenantInfo()
     },
-    getUserInfo() {
-      this.$fetch('/ws/admin/user/resource/getProfile?userId=' + this.$route.query.id, {}, 'get')
+    getTenantInfo() {
+      this.$fetch('/ws/admin/tenant/resource/getTenantById?tenantId=' + this.$route.query.id, {}, 'get')
         .then(res => {
           if (res.code === '0000') {
-            this.userInfo = { ...this.userInfo, ...res.data }
+            this.tenantInfo = { ...this.tenantInfo, ...res.data }
           } else {
             this.$notify.error({
               title: '错误',

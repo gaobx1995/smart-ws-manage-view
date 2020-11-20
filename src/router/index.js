@@ -95,6 +95,38 @@ export const constantRoutes = [
       component: () => import('@/views/groups/edit'),
       meta: { title: '组编辑' }
     }]
+  },
+  {
+    path: '/adminManage/tenants',
+    hidden: true,
+    component: Layout,
+    children: [{
+      path: 'index',
+      name: 'TenantsIndex',
+      component: () => import('@/views/tenants/index'),
+      meta: { title: '租户管理' }
+    }, {
+      path: 'form',
+      name: 'TenantsForm',
+      component: () => import('@/views/tenants/form'),
+      meta: { title: '租户表单' }
+    }, {
+      path: 'edit',
+      name: 'TenantsEdit',
+      component: () => import('@/views/tenants/edit'),
+      meta: { title: '租户编辑' }
+    }]
+  },
+  {
+    path: '/adminManage/authorizations',
+    hidden: true,
+    component: Layout,
+    children: [{
+      path: 'index',
+      name: 'Authorizations',
+      component: () => import('@/views/authorizations/index'),
+      meta: { title: '授权管理' }
+    }]
   }
 
   // 404 page must be placed at the end !!!

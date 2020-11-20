@@ -3,10 +3,7 @@
     <el-divider />
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/dashboard' }"><strong>首页</strong></el-breadcrumb-item>
-      <el-breadcrumb-item
-        :to="{ path: '/adminManage/index' }"
-        name="asd"
-      ><strong>权限管理</strong></el-breadcrumb-item>
+      <el-breadcrumb-item :to="{ path: '/adminManage/index' }"><strong>权限管理</strong></el-breadcrumb-item>
       <el-breadcrumb-item :to="{ path: '/adminManage/groups/index' }"><strong>组管理</strong></el-breadcrumb-item>
       <el-breadcrumb-item>编辑组</el-breadcrumb-item>
     </el-breadcrumb>
@@ -15,7 +12,7 @@
       <el-row>
         <el-col :span="3">
           <el-menu
-            default-active="information"
+            :default-active="activeName"
             class="el-menu-vertical-demo"
             @select="handleSelect"
           >
@@ -32,9 +29,9 @@
         </el-col>
         <el-col :span="21">
           <div style="max-height:500px;overflow:auto;">
-            <group-edit-information v-if="tabName==='information'" />
-            <user-edit-account v-if="tabName==='tenants'" />
-            <user-edit-manage v-if="tabName==='userManage'" />
+            <group-edit-information v-if="tabName==='information'" :group-info="groupInfo" />
+            <group-edit-tenant v-if="tabName==='tenants'" :group-info="groupInfo" />
+            <group-edit-users v-if="tabName==='userManage'" :group-info="groupInfo" />
           </div>
         </el-col>
       </el-row>
@@ -44,28 +41,52 @@
 
 <script>
 import groupEditInformation from './editForm/information'
-import userEditManage from '../users/index'
+import groupEditTenant from './editForm/tenants'
+import groupEditUsers from './editForm/users'
 export default {
   name: 'GroupsEdit',
   components: {
     groupEditInformation,
-    userEditManage
+    groupEditTenant,
+    groupEditUsers
   },
   data() {
     return {
       activeName: 'information',
-      tabName: 'information'
+      tabName: 'information',
+      groupInfo: {
+        id: '',
+        name: '',
+        type: ''
+      }
     }
   },
   mounted() {
     this.handleSelect('information')
   },
   methods: {
-    tabClick(tab, event) {
-      this.tabName = tab.name
-    },
     handleSelect(val) {
       this.tabName = val
+      this.getGroupInfo()
+    },
+    getGroupInfo() {
+      this.$fetch('/ws/admin/group/resource/getGroupById?groupId=' + this.$route.query.id, {}, 'get')
+        .then(res => {
+          if (res.code === '0000') {
+            this.groupInfo = { ...this.groupInfo, ...res.data }
+          } else {
+            this.$notify.error({
+              title: '错误',
+              message: res.msg
+            })
+          }
+        })
+        .catch(err => {
+          this.$notify.error({
+            title: '错误',
+            message: err
+          })
+        })
     }
   }
 }
