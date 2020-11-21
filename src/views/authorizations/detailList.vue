@@ -31,9 +31,9 @@
             <span v-if="scope.row.groupId"><i class="el-icon-s-grid" />{{ scope.row.groupId }}</span>
           </span>
           <span v-else>
-            <el-input v-model="scope.row.id" placeholder="人/组 ID">
+            <el-input v-model="scope.row.useId" placeholder="人/组 ID">
               <template slot="prepend">
-                <el-button v-model="scope.row.type" :icon="scope.row.iconClass" @click="iconClick(scope.row)" />
+                <el-button v-model="scope.row.useType" :icon="scope.row.iconClass" @click="iconClick(scope.row)" />
               </template>
             </el-input>
           </span>
@@ -43,16 +43,19 @@
         <template slot-scope="scope">
           <span v-if="scope.row.operType === 'query'">{{ _.join(scope.row.permissions, ',') }}</span>
           <span v-else>
-            <el-input v-model="scope.row.permissions" readonly placeholder="请选择权限">
-              <el-select slot="append" v-model="scope.row.selPermissions" multiple>
-                <el-option
-                  v-for="item in permissionList"
-                  :key="item"
-                  :label="item"
-                  :value="item"
-                />
-              </el-select>
-            </el-input>
+            <el-select v-model="scope.row.permissions" multiple placeholder="请选择权限" @change="selectPermission(scope.row)">
+              <el-checkbox
+                v-model="scope.row.allChecked"
+                style="margin-left: 20px;"
+                @change="selectAllPermission(scope.row)"
+              >全选</el-checkbox>
+              <el-option
+                v-for="item in permissionList"
+                :key="item"
+                :label="item"
+                :value="item"
+              />
+            </el-select>
           </span>
         </template>
       </el-table-column>
@@ -75,11 +78,11 @@
             >编辑</el-button>
             <el-button
               type="text"
-              @click="removeUserGroup(scope.row)"
+              @click="removeAuthorizations(scope.row)"
             >移除</el-button></span>
           <span v-else>
             <el-button size="small" type="success" icon="el-icon-check" circle @click="rowSubmit(scope.row)" />
-            <el-button size="small" type="danger" icon="el-icon-delete" circle /></span>
+            <el-button size="small" type="danger" icon="el-icon-close" circle @click="rowCancel(scope.row)" /></span>
         </template>
       </el-table-column>
     </el-table>
@@ -131,27 +134,161 @@ export default {
   mounted() {
   },
   methods: {
-    iconClick(row) {
-      if (row.iconClass === 'el-icon-user-solid') {
-        row.iconClass = 'el-icon-s-grid'
-      } else {
+    removeAuthorizations(row) {
+      this.$confirm('此操作将永久删除这条数据, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          this.$fetch('/ws/admin/authorization/resource/delete?id=' + row.id, {}, 'delete')
+            .then(res => {
+              if (res.code === '0000') {
+                this.$emit('getList', this.operObj.id)
+                this.$notify({
+                  title: '成功',
+                  message: '操作成功',
+                  type: 'success'
+                })
+              } else {
+                this.$notify.error({
+                  title: '错误',
+                  message: res.msg
+                })
+              }
+            })
+            .catch(err => {
+              this.$notify.error({
+                title: '错误',
+                message: err
+              })
+            })
+        })
+    },
+    handleUpdate(row) {
+      if (row.userId) {
+        row.useId = row.userId
+        row.groupId = null
         row.iconClass = 'el-icon-user-solid'
+      } else {
+        row.useId = row.groupId
+        row.userId = null
+        row.iconClass = 'el-icon-s-grid'
+      }
+      row.allChecked = false
+      if (row.permissions[0] === 'ALL') {
+        row.allChecked = true
+        row.permissions = this.permissionList
+      } else if (row.permissions.length === 0) {
+        row.permissions = []
+      }
+      row.operType = 'edit'
+    },
+    rowCancel(row) {
+      if (row.id) {
+        row.operType = 'query'
+      } else {
+        this.authorizationsInfo = this._.remove(this.authorizationsInfo, item => {
+          return item !== row
+        })
       }
     },
     rowSubmit(row) {
-      console.log(row)
+      if (row.permissions.length === this.permissionList.length) {
+        row.permissions = ['ALL']
+      } else if (row.permissions.length === 0) {
+        row.permissions = ['NONE']
+      }
+      if (row.useType === 'group') {
+        row.groupId = row.useId
+        row.userId = null
+      } else {
+        row.userId = row.useId
+        row.groupId = null
+      }
+      if (row.operType === 'edit') { // 编辑
+        this.$fetch('/ws/admin/authorization/resource/updateProfile', { ...row }, 'put')
+          .then(res => {
+            if (res.code === '0000') {
+              this.$notify({
+                title: '成功',
+                message: '操作成功',
+                type: 'success'
+              })
+              row.operType = 'query'
+            } else {
+              this.$notify.error({
+                title: '错误',
+                message: res.msg
+              })
+            }
+          })
+          .catch(err => {
+            this.$notify.error({
+              title: '错误',
+              message: err
+            })
+          })
+      } else { // 新增
+        this.$fetch('/ws/admin/authorization/create', { ...row }, 'post')
+          .then(res => {
+            if (res.code === '0000') {
+              this.$notify({
+                title: '成功',
+                message: '操作成功',
+                type: 'success'
+              })
+              row.operType = 'query'
+            } else {
+              this.$notify.error({
+                title: '错误',
+                message: res.msg
+              })
+            }
+          })
+          .catch(err => {
+            this.$notify.error({
+              title: '错误',
+              message: err
+            })
+          })
+      }
+    },
+    selectPermission(row) {
+      if (row.permissions.length === this.permissionList.length) {
+        row.allChecked = true
+      } else {
+        row.allChecked = false
+      }
+    },
+    selectAllPermission(row) {
+      if (row.allChecked) {
+        row.permissions = this.permissionList
+      } else {
+        row.permissions = []
+      }
+    },
+    iconClick(row) {
+      if (row.iconClass === 'el-icon-user-solid') {
+        row.iconClass = 'el-icon-s-grid'
+        row.type = 'group'
+      } else {
+        row.iconClass = 'el-icon-user-solid'
+        row.type = 'user'
+      }
     },
     createNewTenant() {
       this.authorizationsInfo.push({
         groupId: '',
         permissions: 'ALL',
         resourceId: '*',
-        resourceType: 0,
-        type: 0,
+        resourceType: this.operObj.id,
+        type: 1,
+        useType: 'user',
         userId: '',
         operType: 'add',
         iconClass: 'el-icon-user-solid',
-        selPermissions: '' }
+        allChecked: false }
       )
     },
     getPermissionList() {

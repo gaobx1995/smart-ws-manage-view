@@ -23,7 +23,12 @@
         </el-col>
         <el-col :span="19">
           <div style="max-height:600px;overflow:auto;">
-            <detailList v-loading="loading" :oper-obj="operObj" :authorizations-info="authorizationsInfo" />
+            <detailList
+              v-loading="loading"
+              :oper-obj="operObj"
+              :authorizations-info="authorizationsInfo"
+              @getList="getAuthorizationById"
+            />
             <el-pagination
               style="float:right"
               :current-page="searchForm.pageNum"
