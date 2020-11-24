@@ -2,11 +2,11 @@
   <div class="app-container">
     <el-row class="row-1">
       <h3 class="tipFont" style="font-size: 24px">
-        <el-button style="float:right" icon="el-icon-plus" plain @click="relateGroup">关联组</el-button>
+        <el-button v-if="groupUserRelation.includes('create')" style="float:right" icon="el-icon-plus" plain @click="relateGroup">关联组</el-button>
       </h3>
       <h4 class="tipFont" style="font-size: 18px">{{ userGroups.first }} {{ userGroups.last }}所属组</h4>
     </el-row>
-    <group-list ref="groupTable" :oper-user-group="operUserGroup" :oper-user-id="userGroups.id" />
+    <group-list v-if="groupListByOper" ref="groupTable" :oper-user-group="operUserGroup" :oper-user-id="userGroups.id" />
     <el-dialog title="勾选组" :visible.sync="dialogSelGroup">
       <group-list
         ref="selGroupTable"
@@ -50,7 +50,9 @@ export default {
         first: '',
         last: ''
       },
-      selArr: []
+      selArr: [],
+      groupListByOper: sessionStorage.getItem('group_list'),
+      groupUserRelation: sessionStorage.getItem('group_member_opermissions')
     }
   },
   watch: {

@@ -24,11 +24,12 @@
           <el-button type="primary" @click="query('query')">查询</el-button>
         </el-form-item>
         <el-form-item style="float:right">
-          <el-button icon="el-icon-plus" plain @click="add">创建租户</el-button>
+          <el-button v-if="tenantCreate" icon="el-icon-plus" plain @click="add">创建租户</el-button>
         </el-form-item>
       </el-form>
 
       <el-table
+        v-if="tenantListByOper"
         ref="groupTable"
         v-loading="loading"
         :row-key="getRowKeys"
@@ -65,12 +66,17 @@
         >
           <template slot-scope="scope">
             <el-button
-              v-if="!operTenant"
+              v-if="!operTenant&& tenantOpermissions.includes('updateProfile')"
               type="text"
               @click="handleUpdate(scope.row)"
             >编辑</el-button>
             <el-button
-              v-if="operUserId"
+              v-if="operUserId && tenantUserRelation.includes('deleteUserShip')"
+              type="text"
+              @click="removeUserTenant(scope.row)"
+            >移除</el-button>
+            <el-button
+              v-else-if="operUserId && tenantUserRelation.includes('deleteGroupShip')"
               type="text"
               @click="removeUserTenant(scope.row)"
             >移除</el-button>
@@ -142,7 +148,11 @@ export default {
         pageNum: 1,
         pageSize: 10,
         total: 0
-      }
+      },
+      tenantCreate: sessionStorage.getItem('tenant_create'),
+      tenantListByOper: sessionStorage.getItem('tenant_list'),
+      tenantUserRelation: sessionStorage.getItem('tenant_member_opermissions'),
+      tenantOpermissions: sessionStorage.getItem('tenant_opermissions')
     }
   },
   mounted() {

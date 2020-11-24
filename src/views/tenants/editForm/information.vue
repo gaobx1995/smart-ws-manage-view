@@ -10,35 +10,39 @@
     >
       <el-row class="row-1">
         <h3 class="tipFont" style="font-size: 24px">租户信息</h3>
-        <el-form-item label="租户名称" prop="name">
-          <el-input v-model="tenantForm.name" placeholder="请输入租户名称" />
-        </el-form-item>
-        <el-form-item label="秘钥" prop="secretKey">
-          <el-input v-model="tenantForm.secretKey" placeholder="请输入秘钥" />
-        </el-form-item>
-        <el-form-item label="⼯单库数据源配置" prop="orderDataSourceConfig">
-          <el-input v-model="tenantForm.orderDataSourceConfig" placeholder="请输入⼯单库数据源配置" />
-        </el-form-item>
-        <el-form-item label="⼯单设计库数据源配置" prop="orderDesignDataSourceConfig">
-          <el-input v-model="tenantForm.orderDesignDataSourceConfig" placeholder="请输入⼯单设计库数据源配置" />
-        </el-form-item>
-        <el-form-item label="接⼝⽹关地址" prop="interfaceGateWayAddr">
-          <el-input v-model="tenantForm.interfaceGateWayAddr" placeholder="请输入接口网关地址" />
-        </el-form-item>
-        <el-form-item label="组织机构树相关接⼝地址" prop="organizationTreeAddr">
-          <el-input v-model="tenantForm.organizationTreeAddr" placeholder="请输入组织机构树相关接⼝地址" />
-        </el-form-item>
-        <el-form-item label="搜索引擎相关配置" prop="searchEngineConfig">
-          <el-input v-model="tenantForm.searchEngineConfig" placeholder="请输入搜索引擎相关配置" />
-        </el-form-item>
-        <el-form-item style="text-align:right;margin-top:5vh;">
-          <el-button type="primary" @click="submitForm('tenantForm')">修改租户信息</el-button>
-        </el-form-item>
-        <h4 class="tipFont" style="font-size: 18px">删除租户</h4>
-        <h3 class="tipFont" style="font-size: 15px"><el-alert title="警告:删除租户无法撤消！" :closable="false" type="error" /></h3>
-        <el-form-item style="text-align:right;">
-          <el-button style="float:right" type="danger" @click="deleteTenant">删除租户</el-button>
-        </el-form-item>
+        <span v-if="tenantOpermissions.includes('updateProfile')">
+          <el-form-item label="租户名称" prop="name">
+            <el-input v-model="tenantForm.name" placeholder="请输入租户名称" />
+          </el-form-item>
+          <el-form-item label="秘钥" prop="secretKey">
+            <el-input v-model="tenantForm.secretKey" placeholder="请输入秘钥" />
+          </el-form-item>
+          <el-form-item label="⼯单库数据源配置" prop="orderDataSourceConfig">
+            <el-input v-model="tenantForm.orderDataSourceConfig" placeholder="请输入⼯单库数据源配置" />
+          </el-form-item>
+          <el-form-item label="⼯单设计库数据源配置" prop="orderDesignDataSourceConfig">
+            <el-input v-model="tenantForm.orderDesignDataSourceConfig" placeholder="请输入⼯单设计库数据源配置" />
+          </el-form-item>
+          <el-form-item label="接⼝⽹关地址" prop="interfaceGateWayAddr">
+            <el-input v-model="tenantForm.interfaceGateWayAddr" placeholder="请输入接口网关地址" />
+          </el-form-item>
+          <el-form-item label="组织机构树相关接⼝地址" prop="organizationTreeAddr">
+            <el-input v-model="tenantForm.organizationTreeAddr" placeholder="请输入组织机构树相关接⼝地址" />
+          </el-form-item>
+          <el-form-item label="搜索引擎相关配置" prop="searchEngineConfig">
+            <el-input v-model="tenantForm.searchEngineConfig" placeholder="请输入搜索引擎相关配置" />
+          </el-form-item>
+          <el-form-item style="text-align:right;margin-top:5vh;">
+            <el-button type="primary" @click="submitForm('tenantForm')">修改租户信息</el-button>
+          </el-form-item>
+        </span>
+        <span v-if="tenantOpermissions.includes('delete')">
+          <h4 class="tipFont" style="font-size: 18px">删除租户</h4>
+          <h3 class="tipFont" style="font-size: 15px"><el-alert title="警告:删除租户无法撤消！" :closable="false" type="error" /></h3>
+          <el-form-item style="text-align:right;">
+            <el-button style="float:right" type="danger" @click="deleteTenant">删除租户</el-button>
+          </el-form-item>
+        </span>
       </el-row>
     </el-form>
   </div>
@@ -76,7 +80,8 @@ export default {
         orderDesignDataSourceConfig: [{ required: true, message: '请输入⼯单设计库数据源配置', trigger: 'blur' }],
         organizationTreeAddr: [{ required: true, message: '请输入组织机构树相关接⼝地址', trigger: 'blur' }],
         searchEngineConfig: [{ required: true, message: '请输入搜索引擎相关配置', trigger: 'blur' }]
-      }
+      },
+      tenantOpermissions: sessionStorage.getItem('tenant_opermissions')
     }
   },
   watch: {

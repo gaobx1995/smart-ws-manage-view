@@ -79,7 +79,8 @@ export default {
         orderDesignDataSourceConfig: [{ required: true, message: '请输入⼯单设计库数据源配置', trigger: 'blur' }],
         organizationTreeAddr: [{ required: true, message: '请输入组织机构树相关接⼝地址', trigger: 'blur' }],
         searchEngineConfig: [{ required: true, message: '请输入搜索引擎相关配置', trigger: 'blur' }]
-      }
+      },
+      tenantCreate: sessionStorage.getItem('tenant_create')
     }
   },
   watch: { },

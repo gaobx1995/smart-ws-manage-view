@@ -13,7 +13,7 @@
     >
       <el-table-column label="类型">
         <template slot-scope="scope">
-          <span v-if="scope.row.operType === 'query'">{{ scope.row.type===0? '全局' : scope.row.type===1? '允许' : scope.row.type===1? '拒绝' : '' }}</span>
+          <span v-if="scope.row.operType === 'query'">{{ scope.row.type===0? '全局' : scope.row.type===1? '允许' : scope.row.type===2? '拒绝' : '' }}</span>
           <el-select v-else v-model="scope.row.type" placeholder="请选择类型">
             <el-option
               v-for="item in options"
@@ -33,7 +33,7 @@
           <span v-else>
             <el-input v-model="scope.row.useId" placeholder="人/组 ID">
               <template slot="prepend">
-                <el-button v-model="scope.row.useType" :icon="scope.row.iconClass" @click="iconClick(scope.row)" />
+                <el-button v-model="scope.row.useType" :icon="scope.row.iconClass" @click="iconClick(scope.row,scope.$index)" />
               </template>
             </el-input>
           </span>
@@ -41,7 +41,7 @@
       </el-table-column>
       <el-table-column label="权限">
         <template slot-scope="scope">
-          <span v-if="scope.row.operType === 'query'">{{ _.join(scope.row.permissions, ',') }}</span>
+          <span v-if="scope.row.operType === 'query'">{{ scope.row.permissions === permissionList? 'ALL':_.join(scope.row.permissions, ',') }}</span>
           <span v-else>
             <el-select v-model="scope.row.permissions" multiple placeholder="请选择权限" @change="selectPermission(scope.row)">
               <el-checkbox
@@ -74,7 +74,7 @@
           <span v-if="scope.row.operType === 'query'">
             <el-button
               type="text"
-              @click="handleUpdate(scope.row)"
+              @click="handleUpdate(scope.row,scope.$index)"
             >编辑</el-button>
             <el-button
               type="text"
@@ -82,7 +82,7 @@
             >移除</el-button></span>
           <span v-else>
             <el-button size="small" type="success" icon="el-icon-check" circle @click="rowSubmit(scope.row)" />
-            <el-button size="small" type="danger" icon="el-icon-close" circle @click="rowCancel(scope.row)" /></span>
+            <el-button size="small" type="danger" icon="el-icon-close" circle @click="rowCancel(scope.row,scope.$index)" /></span>
         </template>
       </el-table-column>
     </el-table>
@@ -118,7 +118,8 @@ export default {
       }, {
         value: 2,
         label: '拒绝'
-      }]
+      }],
+      authorObj: {}
     }
   },
   watch: {
@@ -130,6 +131,8 @@ export default {
       },
       immediate: true
     }
+  },
+  created() {
   },
   mounted() {
   },
@@ -165,28 +168,53 @@ export default {
             })
         })
     },
-    handleUpdate(row) {
+    getAuthorById(id) {
+      this.$fetch('/ws/admin/authorization/resource/getAuthorizationById?id=' + id, {}, 'get')
+        .then(res => {
+          if (res.code === '0000') {
+            this.authorObj = res.data
+          }
+        })
+    },
+    handleUpdate(row, index) {
+      this.getAuthorById(row.id)
+      row.operType = 'edit'
       if (row.userId) {
-        row.useId = row.userId
-        row.groupId = null
-        row.iconClass = 'el-icon-user-solid'
+        this.$set(row, 'iconClass', 'el-icon-user-solid')
+        this.$set(row, 'useId', row.userId)
+        this.$set(row, 'useType', 'user')
       } else {
-        row.useId = row.groupId
-        row.userId = null
-        row.iconClass = 'el-icon-s-grid'
+        this.$set(row, 'iconClass', 'el-icon-s-grid')
+        this.$set(row, 'useId', row.groupId)
+        this.$set(row, 'useType', 'group')
       }
       row.allChecked = false
       if (row.permissions[0] === 'ALL') {
         row.allChecked = true
-        row.permissions = this.permissionList
-      } else if (row.permissions.length === 0) {
-        row.permissions = []
+        this.$set(row, 'permissions', this.permissionList)
+      } else if (row.permissions.length === 0 || row.permissions[0] === 'NONE') {
+        this.$set(row, 'permissions', [])
       }
-      row.operType = 'edit'
     },
-    rowCancel(row) {
+    rowCancel(row, index) {
       if (row.id) {
-        row.operType = 'query'
+        this.$set(row, 'operType', 'query')
+        this.$set(row, 'resourceId', this.authorObj.resourceId)
+        this.$set(row, 'type', this.authorObj.type)
+        // this.$set(row, 'permissions', this.authorObj.permissions)
+        if (this.authorObj.userId) {
+          this.$set(row, 'userId', this.authorObj.userId)
+          this.$set(row, 'groupId', null)
+        } else {
+          this.$set(row, 'groupId', this.authorObj.groupId)
+          this.$set(row, 'userId', null)
+        }
+        if (row.permissions[0] === 'ALL') {
+          this.$set(row, 'allChecked', true)
+          this.$set(row, 'permissions', this.authorObj.permissions)
+        } else if (row.permissions.length === 0 || row.permissions[0] === 'NONE') {
+          this.$set(row, 'permissions', ['NONE'])
+        }
       } else {
         this.authorizationsInfo = this._.remove(this.authorizationsInfo, item => {
           return item !== row
@@ -197,19 +225,22 @@ export default {
       if (row.permissions.length === this.permissionList.length) {
         row.permissions = ['ALL']
       } else if (row.permissions.length === 0) {
-        row.permissions = ['NONE']
+        row.permissions = []
       }
-      if (row.useType === 'group') {
-        row.groupId = row.useId
-        row.userId = null
-      } else {
+      if (row.useType === 'user') {
         row.userId = row.useId
         row.groupId = null
+      } else {
+        row.groupId = row.useId
+        row.userId = null
       }
       if (row.operType === 'edit') { // 编辑
         this.$fetch('/ws/admin/authorization/resource/updateProfile', { ...row }, 'put')
           .then(res => {
             if (res.code === '0000') {
+              if (row.permissions.length === 0) {
+                this.$set(row, 'permissions', ['NONE'])
+              }
               this.$notify({
                 title: '成功',
                 message: '操作成功',
@@ -238,6 +269,10 @@ export default {
                 message: '操作成功',
                 type: 'success'
               })
+              this.$nextTick(() => {
+                row = { ...row, ...res.data }
+              })
+              row.id = res.data.id
               row.operType = 'query'
             } else {
               this.$notify.error({
@@ -268,13 +303,19 @@ export default {
         row.permissions = []
       }
     },
-    iconClick(row) {
+    iconClick(row, index) {
       if (row.iconClass === 'el-icon-user-solid') {
         row.iconClass = 'el-icon-s-grid'
-        row.type = 'group'
+        row.useType = 'group'
+        row.groupId = row.useId
+        row.userId = null
+        this.$set(this.authorizationsInfo, index, row)
       } else {
         row.iconClass = 'el-icon-user-solid'
-        row.type = 'user'
+        row.useType = 'user'
+        row.userId = row.useId
+        row.groupId = null
+        this.$set(this.authorizationsInfo, index, row)
       }
     },
     createNewTenant() {

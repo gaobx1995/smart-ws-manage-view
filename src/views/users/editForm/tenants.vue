@@ -2,11 +2,12 @@
   <div class="app-container">
     <el-row class="row-1">
       <h3 class="tipFont" style="font-size: 24px">
-        <el-button style="float:right" icon="el-icon-plus" plain @click="relateTenant">关联租户</el-button>
+        <el-button v-if="tenantUserRelation.includes('createUserShip')" style="float:right" icon="el-icon-plus" plain @click="relateTenant">关联租户</el-button>
       </h3>
       <h4 class="tipFont" style="font-size: 18px">{{ userTenants.first }} {{ userTenants.last }}租户</h4>
     </el-row>
     <tenant-list
+      v-if="tenantListByOper"
       ref="tenantTable"
       :oper-tenant="operTenant"
       :oper-group-tenant="false"
@@ -59,7 +60,9 @@ export default {
         first: '',
         last: ''
       },
-      selArr: []
+      selArr: [],
+      tenantListByOper: sessionStorage.getItem('tenant_list'),
+      tenantUserRelation: sessionStorage.getItem('tenant_member_opermissions')
     }
   },
   watch: {

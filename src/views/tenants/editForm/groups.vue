@@ -4,6 +4,7 @@
       <h4 class="tipFont" style="font-size: 18px">{{ tenantInfo.name }}所属组</h4>
     </el-row>
     <el-table
+      v-if="groupList"
       v-loading="loading"
       :data="tableData"
       highlight-current-row
@@ -56,7 +57,8 @@ export default {
         total: 0
       },
       tableData: [],
-      loading: false
+      loading: false,
+      groupList: sessionStorage.getItem('group_list')
     }
   },
   watch: {

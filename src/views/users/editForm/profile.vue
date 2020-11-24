@@ -24,7 +24,7 @@
       </el-row>
       <el-row class="row-1">
         <el-form-item style="text-align:right;margin-top:5vh;">
-          <el-button type="primary" @click="submitForm('userForm')">修改用户简介</el-button>
+          <el-button v-if="userOpermissions.includes('updateProfile')" type="primary" @click="submitForm('userForm')">修改用户简介</el-button>
         </el-form-item>
       </el-row>
     </el-form>
@@ -62,7 +62,8 @@ export default {
         email: [{ required: true, message: '请输入邮箱', trigger: 'blur' }, { validator: emailValid, trigger: 'blur' }],
         first: [{ required: true, message: '请输入First Name', trigger: 'blur' }],
         last: [{ required: true, message: '请输入Last Name', trigger: 'blur' }]
-      }
+      },
+      userOpermissions: sessionStorage.getItem('user_opermissions')
     }
   },
   watch: {

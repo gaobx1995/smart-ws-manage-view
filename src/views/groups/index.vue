@@ -27,11 +27,12 @@
           <el-button type="primary" @click="query('query')">查询</el-button>
         </el-form-item>
         <el-form-item style="float:right">
-          <el-button icon="el-icon-plus" plain @click="add">创建组</el-button>
+          <el-button v-if="operGroup" icon="el-icon-plus" plain @click="add">创建组</el-button>
         </el-form-item>
       </el-form>
 
       <el-table
+        v-if="groupListByOper"
         ref="groupTable"
         v-loading="loading"
         :row-key="getRowKeys"
@@ -74,12 +75,12 @@
         >
           <template slot-scope="scope">
             <el-button
-              v-if="!operUserGroup"
+              v-if="!operUserGroup && operPermissions.includes('updateProfile')"
               type="text"
               @click="handleUpdate(scope.row)"
             >编辑</el-button>
             <el-button
-              v-if="operUserGroup"
+              v-if="operUserGroup && groupUserRelation.includes('delete')"
               type="text"
               @click="removeUserGroup(scope.row)"
             >移除</el-button>
@@ -131,7 +132,11 @@ export default {
         pageNum: 1,
         pageSize: 10,
         total: 0
-      }
+      },
+      groupListByOper: sessionStorage.getItem('group_list'),
+      groupUserRelation: sessionStorage.getItem('group_member_opermissions'),
+      operPermissions: sessionStorage.getItem('group_opermissions'),
+      operGroup: sessionStorage.getItem('group_create')
     }
   },
   mounted() {

@@ -65,7 +65,8 @@ export default {
         total: 0
       },
       tableData: [],
-      loading: false
+      loading: false,
+      userList: sessionStorage.getItem('user_list')
     }
   },
   watch: {

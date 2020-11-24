@@ -10,32 +10,37 @@
     >
       <el-row class="row-1">
         <!-- <h3 class="tipFont" style="font-size: 24px">编辑用户</h3> -->
-        <h4 class="tipFont" style="font-size: 18px">修改{{ userAccount.first }} {{ userAccount.last }}密码</h4>
-        <p class="tipFont" style="font-size: 15px">输入新密码以更改现有帐户密码</p>
-        <el-form-item label="登录人密码" prop="authUserPwd">
-          <el-input v-model="userForm.authUserPwd" placeholder="请输入登录人密码" />
-        </el-form-item>
-        <el-form-item label="新密码" prop="password">
-          <el-input v-model="userForm.password" placeholder="请输入新密码" />
-        </el-form-item>
-        <el-form-item label="确认新密码" prop="checkPass">
-          <el-input v-model="userForm.checkPass" placeholder="请输入确认新密码" />
-        </el-form-item>
-        <el-form-item style="text-align:right;">
-          <el-button @click="resetForm('userForm')">重置</el-button>
-          <el-button type="primary" @click="submitForm('userForm')">修改用户密码</el-button>
-        </el-form-item>
-        <h4 class="tipFont" style="font-size: 18px">删除用户</h4>
-        <h3 class="tipFont" style="font-size: 15px"><el-alert title="警告:删除用户无法撤消！" :closable="false" type="error" /></h3>
-        <el-form-item style="text-align:right;">
-          <el-button style="float:right" type="danger" @click="deleteUser">删除用户</el-button>
-        </el-form-item>
-
-        <h4 class="tipFont" style="font-size: 18px">解锁用户</h4>
-        <h3 class="tipFont" style="font-size: 15px"><el-alert title="注意:只有当用户被锁定时才相关!" :closable="false" type="info" /></h3>
-        <el-form-item style="text-align:right;">
-          <el-button style="float:right" type="success" icon="el-icon-lock" @click="unlockUser">解锁用户</el-button>
-        </el-form-item>
+        <span v-if="userOpermissions.includes('updateCredentials')">
+          <h4 class="tipFont" style="font-size: 18px">修改{{ userAccount.first }} {{ userAccount.last }}密码</h4>
+          <p class="tipFont" style="font-size: 15px">输入新密码以更改现有帐户密码</p>
+          <el-form-item label="登录人密码" prop="authUserPwd">
+            <el-input v-model="userForm.authUserPwd" placeholder="请输入登录人密码" />
+          </el-form-item>
+          <el-form-item label="新密码" prop="password">
+            <el-input v-model="userForm.password" placeholder="请输入新密码" />
+          </el-form-item>
+          <el-form-item label="确认新密码" prop="checkPass">
+            <el-input v-model="userForm.checkPass" placeholder="请输入确认新密码" />
+          </el-form-item>
+          <el-form-item style="text-align:right;">
+            <el-button @click="resetForm('userForm')">重置</el-button>
+            <el-button type="primary" @click="submitForm('userForm')">修改用户密码</el-button>
+          </el-form-item>
+        </span>
+        <span v-if="userOpermissions.includes('delete')">
+          <h4 class="tipFont" style="font-size: 18px">删除用户</h4>
+          <h3 class="tipFont" style="font-size: 15px"><el-alert title="警告:删除用户无法撤消！" :closable="false" type="error" /></h3>
+          <el-form-item style="text-align:right;">
+            <el-button style="float:right" type="danger" @click="deleteUser">删除用户</el-button>
+          </el-form-item>
+        </span>
+        <span v-if="userOpermissions.includes('unlock')">
+          <h4 class="tipFont" style="font-size: 18px">解锁用户</h4>
+          <h3 class="tipFont" style="font-size: 15px"><el-alert title="注意:只有当用户被锁定时才相关!" :closable="false" type="info" /></h3>
+          <el-form-item style="text-align:right;">
+            <el-button style="float:right" type="success" icon="el-icon-lock" @click="unlockUser">解锁用户</el-button>
+          </el-form-item>
+        </span>
       </el-row>
     </el-form>
   </div>
@@ -89,7 +94,8 @@ export default {
         authUserPwd: [{ required: true, message: '请输入登录人密码', trigger: 'blur' }],
         password: [{ required: true, message: '请输入密码', trigger: 'blur' }, { validator: validatePass, trigger: 'blur' }],
         checkPass: [{ required: true, message: '请输入确认密码', trigger: 'blur' }, { validator: validatePass2, trigger: 'blur' }]
-      }
+      },
+      userOpermissions: sessionStorage.getItem('user_opermissions')
     }
   },
   watch: {

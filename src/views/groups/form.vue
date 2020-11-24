@@ -30,7 +30,7 @@
           </el-form-item>
         </el-row>
         <el-row class="row-1">
-          <el-form-item style="text-align:right;margin-top:5vh;">
+          <el-form-item v-if="groupCreate" style="text-align:right;margin-top:5vh;">
             <el-button @click="cancel">取 消</el-button>
             <el-button @click="resetForm('groupForm')">重 置</el-button>
             <el-button type="primary" @click="submitForm('groupForm')">提 交</el-button>
@@ -56,7 +56,8 @@ export default {
         id: [{ required: true, message: '请输入ID', trigger: 'blur' }],
         name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
         type: [{ required: true, message: '请输入类型', trigger: 'blur' }]
-      }
+      },
+      groupCreate: sessionStorage.getItem('group_create')
     }
   },
   watch: { },

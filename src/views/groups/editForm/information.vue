@@ -10,21 +10,25 @@
     >
       <el-row class="row-1">
         <h3 class="tipFont" style="font-size: 24px">编辑组camunda BPM管理员</h3>
-        <h4 class="tipFont" style="font-size: 18px">组详细信息</h4>
-        <el-form-item label="组名称" prop="name">
-          <el-input v-model="groupForm.name" placeholder="请输入组名称" />
-        </el-form-item>
-        <el-form-item label="组类型" prop="type">
-          <el-input v-model="groupForm.type" placeholder="请输入组类型" />
-        </el-form-item>
-        <el-form-item style="text-align:right;margin-top:5vh;">
-          <el-button type="primary" @click="submitForm('groupForm')">修改组信息</el-button>
-        </el-form-item>
-        <h4 class="tipFont" style="font-size: 18px">删除组</h4>
-        <h3 class="tipFont" style="font-size: 15px"><el-alert title="警告:删除组无法撤消！" :closable="false" type="error" /></h3>
-        <el-form-item style="text-align:right;">
-          <el-button style="float:right" type="danger" @click="deleteGroup">删除组</el-button>
-        </el-form-item>
+        <span v-if="groupOpermissions.includes('updateProfile')">
+          <h4 class="tipFont" style="font-size: 18px">组详细信息</h4>
+          <el-form-item label="组名称" prop="name">
+            <el-input v-model="groupForm.name" placeholder="请输入组名称" />
+          </el-form-item>
+          <el-form-item label="组类型" prop="type">
+            <el-input v-model="groupForm.type" placeholder="请输入组类型" />
+          </el-form-item>
+          <el-form-item style="text-align:right;margin-top:5vh;">
+            <el-button type="primary" @click="submitForm('groupForm')">修改组信息</el-button>
+          </el-form-item>
+        </span>
+        <span v-if="groupOpermissions.includes('delete')">
+          <h4 class="tipFont" style="font-size: 18px">删除组</h4>
+          <h3 class="tipFont" style="font-size: 15px"><el-alert title="警告:删除组无法撤消！" :closable="false" type="error" /></h3>
+          <el-form-item style="text-align:right;">
+            <el-button style="float:right" type="danger" @click="deleteGroup">删除组</el-button>
+          </el-form-item>
+        </span>
       </el-row>
     </el-form>
   </div>
@@ -52,7 +56,8 @@ export default {
       rules: {
         name: [{ required: true, message: '请输入组名称', trigger: 'blur' }],
         type: [{ required: true, message: '请输入组类型', trigger: 'blur' }]
-      }
+      },
+      groupOpermissions: sessionStorage.getItem('group_opermissions')
     }
   },
   watch: {

@@ -57,7 +57,6 @@ const actions = {
               sessionStorage.clear()
             }
             utils.setToken(response.data.token)
-            console.log(response.data)
             utils.setLoginInfo({
               // tempFlag: '1',
               // zy_token: response.data.token,

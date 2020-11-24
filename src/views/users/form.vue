@@ -40,7 +40,7 @@
           </el-form-item>
         </el-row>
         <el-row class="row-1">
-          <el-form-item style="text-align:right;margin-top:5vh;">
+          <el-form-item v-if="userCreate" style="text-align:right;margin-top:5vh;">
             <el-button @click="cancel">取 消</el-button>
             <el-button @click="resetForm('userForm')">重 置</el-button>
             <el-button type="primary" @click="submitForm('userForm')">提 交</el-button>
@@ -99,7 +99,8 @@ export default {
         id: [{ required: true, message: '请输入ID', trigger: 'blur' }],
         pass: [{ required: true, message: '请输入密码', trigger: 'blur' }, { validator: validatePass, trigger: 'blur' }],
         checkPass: [{ required: true, message: '请输入确认密码', trigger: 'blur' }, { validator: validatePass2, trigger: 'blur' }]
-      }
+      },
+      userCreate: sessionStorage.getItem('user_create')
     }
   },
   watch: { },

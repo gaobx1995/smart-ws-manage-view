@@ -6,7 +6,7 @@
       </h3> -->
       <h4 class="tipFont" style="font-size: 18px">组内用户</h4>
     </el-row>
-    <user-list :oper-group="operGroup" :oper-group-id="groupForm.id" />
+    <user-list v-if="userList" :oper-group="operGroup" :oper-group-id="groupForm.id" />
     <!-- <el-dialog title="勾选组" :visible.sync="dialogSelGroup">
       <group-list :oper-user-group="operUserGroup" :sel-user-group="selUserGroup" @selGroup="selGroup" />
       <div slot="footer" class="dialog-footer">
@@ -42,7 +42,8 @@ export default {
         type: '',
         id: ''
       },
-      selArr: []
+      selArr: [],
+      userList: sessionStorage.getItem('user_list')
     }
   },
   watch: {

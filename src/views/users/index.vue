@@ -24,7 +24,7 @@
           <el-button type="primary" @click="query('query')">查询</el-button>
         </el-form-item>
         <el-form-item style="float:right">
-          <el-button icon="el-icon-plus" plain @click="add">创建用户</el-button>
+          <el-button v-if="operUser" icon="el-icon-plus" plain @click="add">创建用户</el-button>
         </el-form-item>
       </el-form>
 
@@ -59,7 +59,7 @@
           label="邮箱"
         />
         <el-table-column
-          v-if="!operGroup"
+          v-if="!operGroup && operPermissions.includes('updateCredentials')"
           fixed="right"
           label="操作"
           align="center"
@@ -116,13 +116,14 @@ export default {
         pageNum: 1,
         pageSize: 10,
         total: 0
-      }
+      },
+      operPermissions: sessionStorage.getItem('user_opermissions'),
+      operUser: sessionStorage.getItem('user_create')
     }
   },
   mounted() {
     this.query()
   },
-
   methods: {
     add() {
       this.$router.push({
@@ -132,7 +133,6 @@ export default {
         }
       })
     },
-
     handleSizeChange(val) {
       this.searchForm.pageSize = val
       this.query()
@@ -150,25 +150,25 @@ export default {
         }
       })
     },
-    handleDelete(row) {
-      this.$confirm('此操作将永久删除这条数据, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(() => {
-          this.$fetch('/ws/admin/user/resource/delete?userId=' + row.id, {}, 'delete')
-            .then(res => {
-              this.query()
-            })
-            .catch(err => {
-              this.$notify.error({
-                title: '错误',
-                message: err
-              })
-            })
-        })
-    },
+    // handleDelete(row) {
+    //   this.$confirm('此操作将永久删除这条数据, 是否继续?', '提示', {
+    //     confirmButtonText: '确定',
+    //     cancelButtonText: '取消',
+    //     type: 'warning'
+    //   })
+    //     .then(() => {
+    //       this.$fetch('/ws/admin/user/resource/delete?userId=' + row.id, {}, 'delete')
+    //         .then(res => {
+    //           this.query()
+    //         })
+    //         .catch(err => {
+    //           this.$notify.error({
+    //             title: '错误',
+    //             message: err
+    //           })
+    //         })
+    //     })
+    // },
     query(val) {
       this.loading = true
       if (val === 'query') {
