@@ -1,9 +1,21 @@
 <template>
   <div class="navbar">
-    <hamburger :is-active="sidebar.opened" class="hamburger-container" @toggleClick="toggleSideBar" />
+    <!-- <hamburger :is-active="sidebar.opened" class="hamburger-container" @toggleClick="toggleSideBar" /> -->
+    <div class="left-menu">
+      <el-button type="text">跳转按钮</el-button>
+      <el-button type="text">跳转按钮</el-button>
+      <el-button type="text">跳转按钮</el-button>
+      <el-button type="text">跳转按钮</el-button>
+    </div>
     <div class="right-menu">
-      <el-dropdown class="avatar-container" trigger="click">
-        <span class="el-dropdown-link" style="cursor:pointer">
+      <el-dropdown
+        class="avatar-container"
+        trigger="click"
+      >
+        <span
+          class="el-dropdown-link"
+          style="cursor:pointer"
+        >
           登录人<i class="el-icon-arrow-down el-icon--right" />
         </span>
         <el-dropdown-menu slot="dropdown">
@@ -12,7 +24,10 @@
               Home
             </el-dropdown-item>
           </router-link>
-          <el-dropdown-item divided @click.native="logout">
+          <el-dropdown-item
+            divided
+            @click.native="logout"
+          >
             <span style="display:block;">Log Out</span>
           </el-dropdown-item>
         </el-dropdown-menu>
@@ -23,11 +38,11 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import Hamburger from '@/components/Hamburger'
+// import Hamburger from '@/components/Hamburger'
 
 export default {
   components: {
-    Hamburger
+    // Hamburger
   },
   computed: {
     ...mapGetters([
@@ -66,52 +81,37 @@ export default {
   overflow: hidden;
   position: relative;
   background: #fff;
-  box-shadow: 0 1px 4px rgba(0,21,41,.08);
+  box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
 
   .hamburger-container {
     line-height: 46px;
     height: 100%;
     float: left;
     cursor: pointer;
-    transition: background .3s;
-    -webkit-tap-highlight-color:transparent;
+    transition: background 0.3s;
+    -webkit-tap-highlight-color: transparent;
 
     &:hover {
-      background: rgba(0, 0, 0, .025)
+      background: rgba(0, 0, 0, 0.025);
     }
   }
 
   .breadcrumb-container {
     float: left;
   }
-
+  .left-menu {
+    float: left;
+    height: 100%;
+    line-height: 50px;
+    margin-left: 1em;
+  }
   .right-menu {
     float: right;
     height: 100%;
     line-height: 50px;
-
     &:focus {
       outline: none;
     }
-
-    .right-menu-item {
-      display: inline-block;
-      padding: 0 8px;
-      height: 100%;
-      font-size: 18px;
-      color: #5a5e66;
-      vertical-align: text-bottom;
-
-      &.hover-effect {
-        cursor: pointer;
-        transition: background .3s;
-
-        &:hover {
-          background: rgba(0, 0, 0, .025)
-        }
-      }
-    }
-
     .avatar-container {
       margin-right: 30px;
 

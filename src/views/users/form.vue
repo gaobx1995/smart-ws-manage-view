@@ -22,8 +22,8 @@
           <el-form-item label="用户ID" prop="id">
             <el-input v-model="userForm.id" placeholder="请输入用户ID" />
           </el-form-item>
-          <el-form-item label="密码" prop="pass">
-            <el-input v-model="userForm.pass" type="password" placeholder="请输入密码" />
+          <el-form-item label="密码" prop="pwd">
+            <el-input v-model="userForm.pwd" type="password" placeholder="请输入密码" />
           </el-form-item>
           <el-form-item label="确认密码" prop="checkPass">
             <el-input v-model="userForm.checkPass" type="password" placeholder="请输入确认密码" />
@@ -68,7 +68,7 @@ export default {
     var validatePass2 = (rule, value, callback) => {
       if (value === '') {
         callback(new Error('请再次输入密码'))
-      } else if (value !== this.userForm.pass) {
+      } else if (value !== this.userForm.pwd) {
         callback(new Error('两次输入密码不一致!'))
       } else {
         callback()
@@ -89,7 +89,7 @@ export default {
         first: '',
         last: '',
         id: '',
-        pass: '',
+        pwd: '',
         checkPass: ''
       },
       rules: {
@@ -97,7 +97,7 @@ export default {
         first: [{ required: true, message: '请输入First Name', trigger: 'blur' }],
         last: [{ required: true, message: '请输入Last Name', trigger: 'blur' }],
         id: [{ required: true, message: '请输入ID', trigger: 'blur' }],
-        pass: [{ required: true, message: '请输入密码', trigger: 'blur' }, { validator: validatePass, trigger: 'blur' }],
+        pwd: [{ required: true, message: '请输入密码', trigger: 'blur' }, { validator: validatePass, trigger: 'blur' }],
         checkPass: [{ required: true, message: '请输入确认密码', trigger: 'blur' }, { validator: validatePass2, trigger: 'blur' }]
       },
       userCreate: sessionStorage.getItem('user_create')
